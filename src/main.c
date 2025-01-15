@@ -101,28 +101,31 @@ void move (void)
 {
 	static const double movementspeed = 0.005;
 	static const double turnspeed = 2 * PI * 0.003;
-	if (keypresses & KEY_w | keypresses & KEY_COMMA | keypresses & KEY_UP) {
-		player.x += movementspeed * cos(player.dir);
-		player.y -= movementspeed * sin(player.dir);
-	}
-	if (keypresses & KEY_a) {
-		player.x += movementspeed * cos(player.dir + PI / 2);
-		player.y -= movementspeed * sin(player.dir + PI / 2);
-	}
-	if (keypresses & KEY_s | keypresses & KEY_o | keypresses & KEY_DOWN) {
-		player.x -= movementspeed * cos(player.dir);
-		player.y += movementspeed * sin(player.dir);
-	}
-	if (keypresses & KEY_d | keypresses & KEY_e) {
-		player.x += movementspeed * cos(player.dir - PI / 2);
-		player.y -= movementspeed * sin(player.dir - PI / 2);
-	}
-	if (keypresses & KEY_LEFT) {
-		player.dir += turnspeed;
-	}
-	if (keypresses & KEY_RIGHT) {
-		player.dir -= turnspeed;
-	}
+
+	bool move_forwards = (keypresses & KEY_w) | (keypresses & KEY_COMMA) | (keypresses & KEY_UP);
+	bool move_left = (keypresses & KEY_a);
+	bool move_backwards = (keypresses & KEY_s) | (keypresses & KEY_o) | (keypresses & KEY_DOWN);
+	bool move_right = (keypresses & KEY_d) | (keypresses & KEY_e);
+	bool turn_left = (keypresses & KEY_LEFT);
+	bool turn_right = (keypresses & KEY_RIGHT);
+
+	double move_x = movementspeed * (
+		move_forwards * cos(player.dir) +
+		move_left * cos(player.dir + PI / 2) +
+		move_right * cos(player.dir - PI / 2) +
+		move_backwards * -cos(player.dir)
+	);
+	double move_y = movementspeed * (
+		move_forwards * sin(player.dir) +
+		move_left * sin(player.dir + PI / 2) +
+		move_right * sin(player.dir - PI / 2) +
+		move_backwards * -sin(player.dir)
+	);
+
+	player.x += move_x * !map[(int)player.y][(int)(player.x + move_x)];
+	player.y -= move_y * !map[(int)(player.y - move_y)][(int)player.x];
+	player.dir += turnspeed * turn_left;
+	player.dir -= turnspeed * turn_right;
 }
 
 void render (SDL_Renderer *renderer)
