@@ -210,12 +210,11 @@ void render (SDL_Renderer *renderer)
 			shade = 0;
 		}
 		SDL_SetRenderDrawColor(renderer, (side ? 0xff : 0xdd) * shade, 0, 0, 0);
-		int wallheight = 6;
 		SDL_RenderFillRectF(renderer, &(SDL_FRect){
 			.x = WINDOW_WIDTH - i - 1,
-			.y = WINDOW_HEIGHT / 2 - (wallheight / mindist) * WINDOW_HEIGHT / MAP_HEIGHT / 2,
+			.y = WINDOW_HEIGHT / 2 - (WINDOW_HEIGHT / mindist) / 2,
 			.w = 1,
-			.h = (wallheight / mindist) * WINDOW_HEIGHT / MAP_HEIGHT,
+			.h = (WINDOW_HEIGHT / mindist),
 		});
 	}
 
