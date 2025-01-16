@@ -204,18 +204,18 @@ void render (SDL_Window *window, SDL_Renderer *renderer)
 
 		currentY = player.y;
 		currentX = player.x;
-		double mindist = distX < distY ? distX : distY;
-		mindist *= cos(player.dir - dir);
+		double trueDist = distX < distY ? distX : distY;
+		double correctedDist = trueDist * cos(player.dir - dir);
 		int xSide = distX < distY;
-		currentX += mindist * cos(dir);
-		currentY -= mindist * sin(dir);
+		currentX += trueDist * cos(dir);
+		currentY -= trueDist * sin(dir);
 
 		double maxDist = sqrt(MAP_WIDTH * MAP_WIDTH + MAP_HEIGHT * MAP_HEIGHT);
-		double shade = (maxDist - mindist) / maxDist;
+		double shade = (maxDist - trueDist) / maxDist;
 
 		static const double wallHeight = 1;
 		double cameraHeight = 2 * tan(VFOV / 2);
-		double windowY = (wallHeight / 2) / mindist;
+		double windowY = (wallHeight / 2) / correctedDist;
 		double screenWallHeight = h * (windowY * 2) / cameraHeight;
 
 		SDL_SetRenderDrawColor(renderer, (xSide ? 0xff : 0xdd) * shade, 0, 0, 0);
