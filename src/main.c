@@ -143,13 +143,13 @@ void render (SDL_Window *window, SDL_Renderer *renderer)
 	SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
 	SDL_RenderClear(renderer);
 
-	static const double HFOV = PI / 2; // π/2 max
+	static const double HFOV = PI / 2; // cannot be a multiple of π
 	double VFOV = 2 * atan(tan(HFOV / 2) * ((double)h / w));
 	for (int i = 0; i < w; i++) {
 		double cameraWidth = 2 * tan(HFOV / 2);
 		double cameraX = cameraWidth * i / (double)w - cameraWidth / 2;
 
-		double dir = player.dir + PI / 2 - atan2(1, cameraX);
+		double dir = player.dir + PI / 2 - atan2(1, cameraX * (HFOV > PI ? -1 : 1));
 
 		int mapX = player.x;
 		int mapY = player.y;
