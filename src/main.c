@@ -9,7 +9,7 @@
 #define PI 3.1415926535897932384626433
 
 void move (double frameTime);
-void render (SDL_Renderer *renderer);
+void render (SDL_Window *window, SDL_Renderer *renderer);
 
 Player player;
 
@@ -96,7 +96,7 @@ int main (void)
 
 		move(frameTime);
 
-		render(renderer);
+		render(window, renderer);
 	}
 
 	SDL_DestroyWindow(window);
@@ -135,15 +135,18 @@ void move (double frameTime)
 	player.dir -= turnspeed * turn_right;
 }
 
-void render (SDL_Renderer *renderer)
+void render (SDL_Window *window, SDL_Renderer *renderer)
 {
+	int w, h;
+	SDL_GetWindowSize(window, &w, &h);
+
 	SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
 	SDL_RenderClear(renderer);
 
 	static const double HFOV = PI / 2;
-	double VFOV = 2 * atan(tan(HFOV / 2) * (WINDOW_HEIGHT / WINDOW_WIDTH));
-	for (int i = 0; i < WINDOW_WIDTH; i++) {
-		double cameraX = 2 * i / (double)WINDOW_WIDTH - 1;
+	double VFOV = 2 * atan(tan(HFOV / 2) * ((double)h / w));
+	for (int i = 0; i < w; i++) {
+		double cameraX = 2 * i / (double)w - 1;
 
 		double dir = player.dir + HFOV - atan2(1, cameraX);
 
@@ -202,7 +205,7 @@ void render (SDL_Renderer *renderer)
 		currentX = player.x;
 		double mindist = distX < distY ? distX : distY;
 		mindist *= cos(player.dir - dir);
-		int side = distX < distY;
+		int xSide = distX < distY;
 		currentX += mindist * cos(dir);
 		currentY -= mindist * sin(dir);
 
@@ -212,12 +215,12 @@ void render (SDL_Renderer *renderer)
 		static const double wallHeight = 1;
 		double cameraHeight = 2 * tan(VFOV / 2);
 		double windowY = (wallHeight / 2) / mindist;
-		double screenWallHeight = WINDOW_HEIGHT * (windowY * 2) / cameraHeight;
+		double screenWallHeight = h * (windowY * 2) / cameraHeight;
 
-		SDL_SetRenderDrawColor(renderer, (side ? 0xff : 0xdd) * shade, 0, 0, 0);
+		SDL_SetRenderDrawColor(renderer, (xSide ? 0xff : 0xdd) * shade, 0, 0, 0);
 		SDL_RenderFillRectF(renderer, &(SDL_FRect){
-			.x = WINDOW_WIDTH - i - 1,
-			.y = WINDOW_HEIGHT / 2 - screenWallHeight / 2,
+			.x = w - i - 1,
+			.y = h / 2 - screenWallHeight / 2,
 			.w = 1,
 			.h = screenWallHeight,
 		});
