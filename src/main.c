@@ -213,12 +213,29 @@ void render (SDL_Window *window, SDL_Renderer *renderer)
 		double maxDist = sqrt(MAP_WIDTH * MAP_WIDTH + MAP_HEIGHT * MAP_HEIGHT);
 		double shade = (maxDist - trueDist) / maxDist;
 
+		int wallType = map[(int)currentY][(int)currentX];
+		if (xSide) {
+			if (cos(dir) < 0) {
+				wallType = map[(int)currentY][(int)currentX - 1];
+			}
+		} else {
+			if (sin(dir) > 0) {
+				wallType = map[(int)currentY - 1][(int)currentX];
+			}
+		}
+
 		static const double wallHeight = 1;
 		double cameraHeight = 2 * tan(VFOV / 2);
 		double windowY = (wallHeight / 2) / correctedDist;
 		double screenWallHeight = h * (windowY * 2) / cameraHeight;
 
-		SDL_SetRenderDrawColor(renderer, (xSide ? 0xff : 0xdd) * shade, 0, 0, 0);
+		double color = (xSide ? 0xff : 0xdd) * shade;
+		switch (wallType) {
+			case 1: SDL_SetRenderDrawColor(renderer, color, 0, 0, 0); break;
+			case 2: SDL_SetRenderDrawColor(renderer, 0, color, 0, 0); break;
+			case 3: SDL_SetRenderDrawColor(renderer, 0, 0, color, 0); break;
+		}
+
 		SDL_RenderFillRectF(renderer, &(SDL_FRect){
 			.x = w - i - 1,
 			.y = h / 2 - screenWallHeight / 2,
