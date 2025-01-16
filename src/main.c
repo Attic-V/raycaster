@@ -8,7 +8,7 @@
 
 #define PI 3.1415926535897932384626433
 
-void move (void);
+void move (double frameTime);
 void render (SDL_Renderer *renderer);
 
 Player player;
@@ -47,6 +47,9 @@ int main (void)
 		.y = 1.5,
 		.dir = 0,
 	};
+
+	double time = 0;
+	double oldTime = 0;
 
 	bool quit = false;
 	while (!quit) {
@@ -87,7 +90,11 @@ int main (void)
 			}
 		}
 
-		move();
+		oldTime = time;
+		time = SDL_GetTicks64();
+		double frameTime = (time - oldTime) / 1000.0;
+
+		move(frameTime);
 
 		render(renderer);
 	}
@@ -97,10 +104,10 @@ int main (void)
 	SDL_Quit();
 }
 
-void move (void)
+void move (double frameTime)
 {
-	static const double movementspeed = 0.005;
-	static const double turnspeed = 2 * PI * 0.003;
+	double movementspeed = 0.5 * frameTime;
+	double turnspeed = 2 * PI * 0.25 * frameTime;
 
 	bool move_forwards = (keypresses & KEY_w) | (keypresses & KEY_COMMA) | (keypresses & KEY_UP);
 	bool move_left = (keypresses & KEY_a);
