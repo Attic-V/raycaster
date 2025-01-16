@@ -140,11 +140,12 @@ void render (SDL_Renderer *renderer)
 	SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
 	SDL_RenderClear(renderer);
 
-	static const double FOV = PI / 2;
+	static const double HFOV = PI / 2;
+	double VFOV = 2 * atan(tan(HFOV / 2) * (WINDOW_HEIGHT / WINDOW_WIDTH));
 	for (int i = 0; i < WINDOW_WIDTH; i++) {
 		double cameraX = 2 * i / (double)WINDOW_WIDTH - 1;
 
-		double dir = player.dir + FOV - atan2(1, cameraX);
+		double dir = player.dir + HFOV - atan2(1, cameraX);
 
 		int mapX = player.x;
 		int mapY = player.y;
@@ -209,12 +210,18 @@ void render (SDL_Renderer *renderer)
 		if (shade < 0) {
 			shade = 0;
 		}
+
+		static const double wallHeight = 1;
+		double cameraHeight = 2 * tan(VFOV / 2);
+		double windowY = (wallHeight / 2) / mindist;
+		double screenWallHeight = WINDOW_HEIGHT * (windowY * 2) / cameraHeight;
+
 		SDL_SetRenderDrawColor(renderer, (side ? 0xff : 0xdd) * shade, 0, 0, 0);
 		SDL_RenderFillRectF(renderer, &(SDL_FRect){
 			.x = WINDOW_WIDTH - i - 1,
-			.y = WINDOW_HEIGHT / 2 - (WINDOW_HEIGHT / mindist) / 2,
+			.y = WINDOW_HEIGHT / 2 - screenWallHeight / 2,
 			.w = 1,
-			.h = (WINDOW_HEIGHT / mindist),
+			.h = screenWallHeight,
 		});
 	}
 
