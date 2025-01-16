@@ -146,7 +146,8 @@ void render (SDL_Window *window, SDL_Renderer *renderer)
 	static const double HFOV = PI / 2; // π/2 max
 	double VFOV = 2 * atan(tan(HFOV / 2) * ((double)h / w));
 	for (int i = 0; i < w; i++) {
-		double cameraX = 2 * i / (double)w - 1;
+		double cameraWidth = 2 * tan(HFOV / 2);
+		double cameraX = cameraWidth * i / (double)w - cameraWidth / 2;
 
 		double dir = player.dir + PI / 2 - atan2(1, cameraX);
 
