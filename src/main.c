@@ -206,10 +206,8 @@ void render (SDL_Renderer *renderer)
 		currentX += mindist * cos(dir);
 		currentY -= mindist * sin(dir);
 
-		double shade = (sqrt(MAP_WIDTH * MAP_HEIGHT) - mindist) / sqrt(MAP_WIDTH * MAP_HEIGHT);
-		if (shade < 0) {
-			shade = 0;
-		}
+		double maxDist = sqrt(MAP_WIDTH * MAP_WIDTH + MAP_HEIGHT * MAP_HEIGHT);
+		double shade = (maxDist - mindist) / maxDist;
 
 		static const double wallHeight = 1;
 		double cameraHeight = 2 * tan(VFOV / 2);
