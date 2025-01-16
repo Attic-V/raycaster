@@ -106,7 +106,7 @@ int main (void)
 
 void move (double frameTime)
 {
-	double movementspeed = 0.5 * frameTime;
+	double movementspeed = 1.5 * frameTime;
 	double turnspeed = 2 * PI * 0.25 * frameTime;
 
 	bool move_forwards = (keypresses & KEY_w) | (keypresses & KEY_COMMA) | (keypresses & KEY_UP);
