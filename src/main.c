@@ -140,31 +140,84 @@ void render (SDL_Renderer *renderer)
 	SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
 	SDL_RenderClear(renderer);
 
-	static const int mapscale = WINDOW_HEIGHT / MAP_HEIGHT;
-	SDL_SetRenderDrawColor(renderer, 0xff, 0xff, 0xff, 0);
-	for (int i = 0; i < MAP_HEIGHT; i++) {
-		for (int j = 0; j < MAP_WIDTH; j++) {
-			if (!map[i][j]) continue;
-			SDL_RenderFillRect(renderer, &(SDL_Rect){
-				.x = j * mapscale,
-				.y = i * mapscale,
-				.w = mapscale,
-				.h = mapscale,
-			});
-		}
-	}
+	static const double FOV = PI / 2;
+	for (int i = 0; i < WINDOW_WIDTH; i++) {
+		double cameraX = 2 * i / (double)WINDOW_WIDTH - 1;
 
-	SDL_SetRenderDrawColor(renderer, 0x88, 0x88, 0x88, 0);
-	SDL_RenderFillRectF(renderer, &(SDL_FRect){
-		.x = player.x * mapscale - mapscale * 0.05,
-		.y = player.y * mapscale - mapscale * 0.05,
-		.w = mapscale * 0.1,
-		.h = mapscale * 0.1,
-	});
-	SDL_RenderDrawLineF(renderer,
-		player.x * mapscale, player.y * mapscale,
-		(player.x + cos(player.dir) * 0.1) * mapscale, (player.y - sin(player.dir) * 0.1) * mapscale
-	);
+		double dir = player.dir + FOV - atan2(1, cameraX);
+
+		int mapX = player.x;
+		int mapY = player.y;
+
+		double diffX = player.x - mapX;
+		double diffY = player.y - mapY;
+
+		double currentY, currentX;
+		double distX, distY;
+
+		currentY = player.y;
+		currentX = player.x;
+		if (cos(dir) < 0) {
+			currentX -= diffX;
+			currentY += diffX * tan(dir);
+			while (0 < currentY && currentY < MAP_HEIGHT && !map[(int)currentY][(int)currentX - 1]) {
+				currentX--;
+				currentY += tan(dir);
+			}
+		} else if (cos(dir) > 0) {
+			currentX += 1 - diffX;
+			currentY -= (1 - diffX) * tan(dir);
+			while (0 < currentY && currentY < MAP_HEIGHT && !map[(int)currentY][(int)currentX]) {
+				currentX++;
+				currentY -= tan(dir);
+			}
+		} else {
+			currentX = 1e30;
+		}
+		distX = sqrt((player.x - currentX) * (player.x - currentX) + (player.y - currentY) * (player.y - currentY));
+
+		currentY = player.y;
+		currentX = player.x;
+		if (sin(dir) > 0) {
+			currentY -= diffY;
+			currentX += diffY / tan(dir);
+			while (0 < currentX && currentX < MAP_WIDTH && !map[(int)currentY - 1][(int)currentX]) {
+				currentY--;
+				currentX += 1 / tan(dir);
+			}
+		} else if (sin(dir) < 0) {
+			currentY += 1 - diffY;
+			currentX -= (1 - diffY) / tan(dir);
+			while (0 < currentX && currentX < MAP_WIDTH && !map[(int)currentY][(int)currentX]) {
+				currentY++;
+				currentX -= 1 / tan(dir);
+			}
+		} else {
+			currentY = 1e30;
+		}
+		distY = sqrt((player.x - currentX) * (player.x - currentX) + (player.y - currentY) * (player.y - currentY));
+
+		currentY = player.y;
+		currentX = player.x;
+		double mindist = distX < distY ? distX : distY;
+		mindist *= cos(player.dir - dir);
+		int side = distX < distY;
+		currentX += mindist * cos(dir);
+		currentY -= mindist * sin(dir);
+
+		double shade = (sqrt(MAP_WIDTH * MAP_HEIGHT) - mindist) / sqrt(MAP_WIDTH * MAP_HEIGHT);
+		if (shade < 0) {
+			shade = 0;
+		}
+		SDL_SetRenderDrawColor(renderer, (side ? 0xff : 0xdd) * shade, 0, 0, 0);
+		int wallheight = 6;
+		SDL_RenderFillRectF(renderer, &(SDL_FRect){
+			.x = WINDOW_WIDTH - i - 1,
+			.y = WINDOW_HEIGHT / 2 - (wallheight / mindist) * WINDOW_HEIGHT / MAP_HEIGHT / 2,
+			.w = 1,
+			.h = (wallheight / mindist) * WINDOW_HEIGHT / MAP_HEIGHT,
+		});
+	}
 
 	SDL_RenderPresent(renderer);
 }
