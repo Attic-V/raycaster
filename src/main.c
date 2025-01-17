@@ -10,6 +10,7 @@
 
 void move (double frameTime);
 void render (SDL_Window *window, SDL_Renderer *renderer);
+void setRenderDrawColor (SDL_Renderer *renderer, uint32_t color);
 
 Player player;
 
@@ -182,22 +183,20 @@ void render (SDL_Window *window, SDL_Renderer *renderer)
 		double minDist = side == 0 ? distX - deltaX : distY - deltaY;
 		double dist = minDist * cos(player.dir - dir);
 
-		int type = map[mapY][mapX];
-
-		double maxDist = sqrt(MAP_WIDTH * MAP_WIDTH + MAP_HEIGHT * MAP_HEIGHT);
-		double shade = (maxDist - minDist) / maxDist;
-
 		static const double wallHeight = 1;
 		double cameraHeight = 2 * tan(VFOV / 2);
 		double windowY = (wallHeight / 2) / dist;
 		double screenWallHeight = h * (windowY * 2) / cameraHeight;
 
-		double color = (side ? 0xff : 0xdd) * shade;
-		switch (type) {
-			case 1: SDL_SetRenderDrawColor(renderer, color, 0, 0, 0); break;
-			case 2: SDL_SetRenderDrawColor(renderer, 0, color, 0, 0); break;
-			case 3: SDL_SetRenderDrawColor(renderer, 0, 0, color, 0); break;
+		uint8_t hue = side ? 0xff : 0xdd;
+		uint32_t color = hue;
+		switch (map[mapY][mapX]) {
+			case 1: color <<= 8 * 3; break;
+			case 2: color <<= 8 * 2; break;
+			case 3: color <<= 8 * 1; break;
+			default: color = 0xffffff00;
 		}
+		setRenderDrawColor(renderer, color);
 
 		SDL_RenderFillRectF(renderer, &(SDL_FRect){
 			.x = w - i - 1,
@@ -208,4 +207,14 @@ void render (SDL_Window *window, SDL_Renderer *renderer)
 	}
 
 	SDL_RenderPresent(renderer);
+}
+
+void setRenderDrawColor (SDL_Renderer *renderer, uint32_t color)
+{
+	SDL_SetRenderDrawColor(renderer,
+		(color & 0xff000000) >> 8 * 3,
+		(color & 0x00ff0000) >> 8 * 2,
+		(color & 0x0000ff00) >> 8 * 1,
+		(color & 0x000000ff) >> 8 * 0
+	);
 }
