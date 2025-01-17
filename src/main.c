@@ -154,83 +154,59 @@ void render (SDL_Window *window, SDL_Renderer *renderer)
 		int mapX = player.x;
 		int mapY = player.y;
 
-		double diffX = player.x - mapX;
-		double diffY = player.y - mapY;
+		double dirX = cos(dir);
+		double dirY = sin(dir);
 
-		double currentY, currentX;
+		double deltaX = dirX == 0 ? 1e30 : fabs(1 / dirX);
+		double deltaY = dirY == 0 ? 1e30 : fabs(1 / dirY);
+
 		double distX, distY;
 
-		currentY = player.y;
-		currentX = player.x;
-		if (cos(dir) < 0) {
-			currentX -= diffX;
-			currentY += diffX * tan(dir);
-			while (0 < currentY && currentY < MAP_HEIGHT && !map[(int)currentY][(int)currentX - 1]) {
-				currentX--;
-				currentY += tan(dir);
-			}
-		} else if (cos(dir) > 0) {
-			currentX += 1 - diffX;
-			currentY -= (1 - diffX) * tan(dir);
-			while (0 < currentY && currentY < MAP_HEIGHT && !map[(int)currentY][(int)currentX]) {
-				currentX++;
-				currentY -= tan(dir);
-			}
-		} else {
-			currentX = 1e30;
-		}
-		distX = sqrt((player.x - currentX) * (player.x - currentX) + (player.y - currentY) * (player.y - currentY));
+		int sX, sY;
 
-		currentY = player.y;
-		currentX = player.x;
-		if (sin(dir) > 0) {
-			currentY -= diffY;
-			currentX += diffY / tan(dir);
-			while (0 < currentX && currentX < MAP_WIDTH && !map[(int)currentY - 1][(int)currentX]) {
-				currentY--;
-				currentX += 1 / tan(dir);
-			}
-		} else if (sin(dir) < 0) {
-			currentY += 1 - diffY;
-			currentX -= (1 - diffY) / tan(dir);
-			while (0 < currentX && currentX < MAP_WIDTH && !map[(int)currentY][(int)currentX]) {
-				currentY++;
-				currentX -= 1 / tan(dir);
-			}
+		if (dirX < 0) {
+			distX = deltaX * (player.x - mapX);
+			sX = -1;
 		} else {
-			currentY = 1e30;
+			distX = deltaX * (1 - player.x + mapX);
+			sX = 1;
 		}
-		distY = sqrt((player.x - currentX) * (player.x - currentX) + (player.y - currentY) * (player.y - currentY));
+		if (dirY > 0) {
+			distY = deltaY * (player.y - mapY);
+			sY = -1;
+		} else {
+			distY = deltaY * (1 - player.y + mapY);
+			sY = 1;
+		}
 
-		currentY = player.y;
-		currentX = player.x;
-		double trueDist = distX < distY ? distX : distY;
-		double correctedDist = trueDist * cos(player.dir - dir);
-		int xSide = distX < distY;
-		currentX += trueDist * cos(dir);
-		currentY -= trueDist * sin(dir);
+		int side = 0;
+		while (!map[mapY][mapX]) {
+			if (distX < distY) {
+				mapX += sX;
+				distX += deltaX;
+				side = 0;
+			} else {
+				mapY += sY;
+				distY += deltaY;
+				side = 1;
+			}
+		}
+
+		double minDist = side == 0 ? distX - deltaX : distY - deltaY;
+		double dist = minDist * cos(player.dir - dir);
+
+		int type = map[mapY][mapX];
 
 		double maxDist = sqrt(MAP_WIDTH * MAP_WIDTH + MAP_HEIGHT * MAP_HEIGHT);
-		double shade = (maxDist - trueDist) / maxDist;
-
-		int wallType = map[(int)currentY][(int)currentX];
-		if (xSide) {
-			if (cos(dir) < 0) {
-				wallType = map[(int)currentY][(int)currentX - 1];
-			}
-		} else {
-			if (sin(dir) > 0) {
-				wallType = map[(int)currentY - 1][(int)currentX];
-			}
-		}
+		double shade = (maxDist - minDist) / maxDist;
 
 		static const double wallHeight = 1;
 		double cameraHeight = 2 * tan(VFOV / 2);
-		double windowY = (wallHeight / 2) / correctedDist;
+		double windowY = (wallHeight / 2) / dist;
 		double screenWallHeight = h * (windowY * 2) / cameraHeight;
 
-		double color = (xSide ? 0xff : 0xdd) * shade;
-		switch (wallType) {
+		double color = (side ? 0xff : 0xdd) * shade;
+		switch (type) {
 			case 1: SDL_SetRenderDrawColor(renderer, color, 0, 0, 0); break;
 			case 2: SDL_SetRenderDrawColor(renderer, 0, color, 0, 0); break;
 			case 3: SDL_SetRenderDrawColor(renderer, 0, 0, color, 0); break;
