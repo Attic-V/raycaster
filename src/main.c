@@ -160,24 +160,11 @@ void render (SDL_Window *window, SDL_Renderer *renderer)
 		double deltaX = dirX == 0 ? 1e30 : fabs(1 / dirX);
 		double deltaY = dirY == 0 ? 1e30 : fabs(1 / dirY);
 
-		double distX, distY;
+		double distX = deltaX * (dirX < 0 ? player.x - mapX : 1 - player.x + mapX);
+		double distY = deltaY * (dirY > 0 ? player.y - mapY : 1 - player.y + mapY);
 
-		int sX, sY;
-
-		if (dirX < 0) {
-			distX = deltaX * (player.x - mapX);
-			sX = -1;
-		} else {
-			distX = deltaX * (1 - player.x + mapX);
-			sX = 1;
-		}
-		if (dirY > 0) {
-			distY = deltaY * (player.y - mapY);
-			sY = -1;
-		} else {
-			distY = deltaY * (1 - player.y + mapY);
-			sY = 1;
-		}
+		int sX = dirX < 0 ? -1 : 1;
+		int sY = dirY > 0 ? -1 : 1;
 
 		int side = 0;
 		while (!map[mapY][mapX]) {
