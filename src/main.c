@@ -51,7 +51,7 @@ int main (void)
 		SDL_WINDOW_BORDERLESS
 	);
 
-	SDL_Renderer *renderer = SDL_CreateRenderer(window, -1, 0);
+	SDL_Renderer *renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
 
 	player = (Player){
 		.x = 1.5,
