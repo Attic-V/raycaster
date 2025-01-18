@@ -4,6 +4,7 @@
 
 #include "map.h"
 #include "player.h"
+#include "utils.h"
 #include "window.h"
 
 #define PI 3.1415926535897932384626433
@@ -240,7 +241,7 @@ void render (SDL_Window *window, SDL_Renderer *renderer)
 			int x = wallX * TEXTURE_SIZE;
 			uint32_t *column = textures[type - 1][x];
 
-			for (int j = lineStart; j < lineEnd; j++) {
+			for (int j = max(lineStart, 0); j < min(lineEnd, h); j++) {
 				int y = (double)(j - lineStart) / (lineEnd - lineStart) * TEXTURE_SIZE;
 				int c = column[y];
 				if (side) {
@@ -268,8 +269,8 @@ void render (SDL_Window *window, SDL_Renderer *renderer)
 			};
 			setRenderDrawColor(renderer, color);
 			SDL_RenderDrawLineF(renderer,
-				w - i - 1, lineStart,
-				w - i - 1, lineEnd
+				w - i - 1, max(lineStart, 0),
+				w - i - 1, min(lineEnd, h)
 			);
 		}
 	}
