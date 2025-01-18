@@ -217,6 +217,8 @@ void render (SDL_Window *window, SDL_Renderer *renderer)
 
 		double trueDist = side == 0 ? distX - deltaX : distY - deltaY;
 		double dist = trueDist * cos(player.dir - dir);
+		double maxDist = sqrt((MAP_WIDTH - 2) * (MAP_WIDTH - 2) + (MAP_HEIGHT - 2) * (MAP_HEIGHT - 2));
+		double percentMaxDist = (maxDist - trueDist) / maxDist;
 
 		static const double wallHeight = 1;
 		double cameraHeight = 2 * tan(VFOV / 2);
@@ -250,6 +252,10 @@ void render (SDL_Window *window, SDL_Renderer *renderer)
 					c &= 0xffffff00;
 					c |= a;
 				};
+				uint8_t a = c & 0xff;
+				a *= percentMaxDist;
+				c &= 0xffffff00;
+				c |= a;
 				setRenderDrawColor(renderer, c);
 				SDL_RenderDrawPoint(renderer, w - i - 1, j);
 			}
@@ -267,6 +273,10 @@ void render (SDL_Window *window, SDL_Renderer *renderer)
 				color &= 0xffffff00;
 				color |= a;
 			};
+			uint8_t a = color & 0xff;
+			a *= percentMaxDist;
+			color &= 0xffffff00;
+			color |= a;
 			setRenderDrawColor(renderer, color);
 			SDL_RenderDrawLineF(renderer,
 				w - i - 1, max(lineStart, 0),
