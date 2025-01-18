@@ -8,9 +8,16 @@
 
 #define PI 3.1415926535897932384626433
 
+#define TEXTURE_SIZE 256
+#define TEXTURE_COUNT 4
+
+void initTextures (void);
 void move (double frameTime);
 void render (SDL_Window *window, SDL_Renderer *renderer);
 void setRenderDrawColor (SDL_Renderer *renderer, uint32_t color);
+
+bool texturesOn = true;
+uint32_t textures[TEXTURE_COUNT][TEXTURE_SIZE][TEXTURE_SIZE];
 
 Player player;
 
@@ -32,6 +39,8 @@ int keypresses = 0;
 
 int main (void)
 {
+	initTextures();
+
 	SDL_Init(SDL_INIT_VIDEO);
 
 	SDL_Window *window = SDL_CreateWindow(
@@ -88,6 +97,7 @@ int main (void)
 				case SDLK_LEFT: keypresses &= ~0 ^ KEY_LEFT; break;
 				case SDLK_DOWN: keypresses &= ~0 ^ KEY_DOWN; break;
 				case SDLK_RIGHT: keypresses &= ~0 ^ KEY_RIGHT; break;
+				case SDLK_SEMICOLON: texturesOn = !texturesOn; break;
 			}
 		}
 
@@ -103,6 +113,30 @@ int main (void)
 	SDL_DestroyWindow(window);
 
 	SDL_Quit();
+}
+
+void initTextures (void)
+{
+	for (int y = 0; y < TEXTURE_SIZE; y++) {
+		for (int x = 0; x < TEXTURE_SIZE; x++) {
+			{
+				int c = 0xff * (abs(y - x) > 4);
+				textures[0][x][y] = c << 24 | 0xff;
+			}
+			{
+				int c = (y + x) % TEXTURE_SIZE;
+				textures[1][x][y] = ((0x44 - c) << 24) | ((0x88 - c) << 16) | ((0xff - c) << 8) | 0xff;
+			}
+			{
+				int c = y;
+				textures[2][x][y] = ((0x44 - c) << 24) | ((0x88 - c) << 16) | ((0xff - c) << 8) | 0xff;
+			}
+			{
+				int c = y ^ x;
+				textures[3][x][y] = ((0xff - c) << 24) | ((0xff - c) << 16) | (c << 8) | 0xff;
+			}
+		}
+	}
 }
 
 void move (double frameTime)
@@ -180,30 +214,64 @@ void render (SDL_Window *window, SDL_Renderer *renderer)
 			}
 		}
 
-		double minDist = side == 0 ? distX - deltaX : distY - deltaY;
-		double dist = minDist * cos(player.dir - dir);
+		double trueDist = side == 0 ? distX - deltaX : distY - deltaY;
+		double dist = trueDist * cos(player.dir - dir);
 
 		static const double wallHeight = 1;
 		double cameraHeight = 2 * tan(VFOV / 2);
 		double windowY = (wallHeight / 2) / dist;
 		double screenWallHeight = h * (windowY * 2) / cameraHeight;
 
-		uint8_t hue = side ? 0xff : 0xdd;
-		uint32_t color = hue;
-		switch (map[mapY][mapX]) {
-			case 1: color <<= 8 * 3; break;
-			case 2: color <<= 8 * 2; break;
-			case 3: color <<= 8 * 1; break;
-			default: color = 0xffffff00;
-		}
-		setRenderDrawColor(renderer, color);
+		int type = map[mapY][mapX];
 
-		SDL_RenderFillRectF(renderer, &(SDL_FRect){
-			.x = w - i - 1,
-			.y = h / 2 - screenWallHeight / 2,
-			.w = 1,
-			.h = screenWallHeight,
-		});
+		int lineStart = h / 2 - screenWallHeight / 2;
+		int lineEnd = h / 2 + screenWallHeight / 2;
+		if (texturesOn) {
+			double collideX = player.x + cos(dir) * trueDist;
+			double collideY = player.y - sin(dir) * trueDist;
+
+			double wallX =
+				side == 0
+					? (sX < 0 ? 1 - collideY + (int)collideY : collideY - (int)collideY)
+					: (sY < 0 ? collideX - (int)collideX : 1 - collideX + (int)collideX)
+				;
+			wallX = fabs(wallX);
+
+			int x = wallX * TEXTURE_SIZE;
+			uint32_t *column = textures[type - 1][x];
+
+			for (int j = lineStart; j < lineEnd; j++) {
+				int y = (double)(j - lineStart) / (lineEnd - lineStart) * TEXTURE_SIZE;
+				int c = column[y];
+				if (side) {
+					uint8_t a = c & 0xff;
+					a *= 0.9;
+					c &= 0xffffff00;
+					c |= a;
+				};
+				setRenderDrawColor(renderer, c);
+				SDL_RenderDrawPoint(renderer, w - i - 1, j);
+			}
+		} else {
+			uint32_t color;
+			switch (type) {
+				case 1: color = 0xff0000ff; break;
+				case 2: color = 0x00ff00ff; break;
+				case 3: color = 0x0000ffff; break;
+				default: color = 0xffffffff;
+			}
+			if (side) {
+				uint8_t a = color & 0xff;
+				a *= 0.9;
+				color &= 0xffffff00;
+				color |= a;
+			};
+			setRenderDrawColor(renderer, color);
+			SDL_RenderDrawLineF(renderer,
+				w - i - 1, lineStart,
+				w - i - 1, lineEnd
+			);
+		}
 	}
 
 	SDL_RenderPresent(renderer);
@@ -211,6 +279,7 @@ void render (SDL_Window *window, SDL_Renderer *renderer)
 
 void setRenderDrawColor (SDL_Renderer *renderer, uint32_t color)
 {
+	SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
 	SDL_SetRenderDrawColor(renderer,
 		(color & 0xff000000) >> 8 * 3,
 		(color & 0x00ff0000) >> 8 * 2,
