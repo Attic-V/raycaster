@@ -162,6 +162,8 @@ void render (SDL_Window *window, SDL_Renderer *renderer)
 		SDL_LockTexture(texture, NULL, &pixels, &pitch);
 	}
 
+	double vanishDist = sqrt((MAP_WIDTH - 2) * (MAP_WIDTH - 2) + (MAP_HEIGHT - 2) * (MAP_HEIGHT - 2));
+
 	static const double HFOV = PI / 2; // cannot be a multiple of π
 	double VFOV = 2 * atan(tan(HFOV / 2) * ((double)h / w));
 	for (int i = 0; i < w; i++) {
@@ -200,8 +202,7 @@ void render (SDL_Window *window, SDL_Renderer *renderer)
 
 		double trueDist = side == 0 ? distX - deltaX : distY - deltaY;
 		double dist = trueDist * cos(player.dir - dir);
-		double maxDist = sqrt((MAP_WIDTH - 2) * (MAP_WIDTH - 2) + (MAP_HEIGHT - 2) * (MAP_HEIGHT - 2));
-		double percentMaxDist = (maxDist - trueDist) / maxDist;
+		double percentVanishDist = (vanishDist - trueDist) / vanishDist;
 
 		static const double wallHeight = 1;
 		double cameraHeight = 2 * tan(VFOV / 2);
@@ -237,7 +238,7 @@ void render (SDL_Window *window, SDL_Renderer *renderer)
 					c |= a;
 				};
 				uint8_t a = c & 0xff;
-				a *= percentMaxDist;
+				a *= percentVanishDist;
 				c &= 0xffffff00;
 				c |= a;
 
@@ -264,7 +265,7 @@ void render (SDL_Window *window, SDL_Renderer *renderer)
 				color |= a;
 			};
 			uint8_t a = color & 0xff;
-			a *= percentMaxDist;
+			a *= percentVanishDist;
 			color &= 0xffffff00;
 			color |= a;
 			SDL_SetRenderTarget(renderer, texture);
