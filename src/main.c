@@ -10,7 +10,7 @@
 #define PI 3.1415926535897932384626433
 
 #define TEXTURE_SIZE 256
-#define TEXTURE_COUNT 5
+#define TEXTURE_COUNT 6
 
 void initTextures (void);
 void move (double frameTime);
@@ -152,8 +152,10 @@ void initTextures (void)
 
 				if (((x + (int)(y / brickH * brickH * offset) % brickW) / brickW * brickW) < TEXTURE_SIZE * 0.2) {
 					textures[4][x][y] = textures[3][x][y];
+					textures[5][x][y] = textures[0][x][y];
 				} else {
 					textures[4][x][y] = textures[0][x][y];
+					textures[5][x][y] = textures[3][x][y];
 				}
 			}
 		}
