@@ -4,7 +4,7 @@
 #include <stdint.h>
 
 #define TEXTURE_SIZE 256
-#define TEXTURE_COUNT 6
+#define TEXTURE_COUNT 7
 
 extern uint32_t textures[TEXTURE_COUNT][TEXTURE_SIZE][TEXTURE_SIZE];
 

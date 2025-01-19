@@ -50,6 +50,9 @@ void initTextures (void)
 					textures[5][x][y] = textures[3][x][y];
 				}
 			}
+			{
+				textures[6][x][y] = ((x ^ y) << 24) | 0xff;
+			}
 		}
 	}
 }
