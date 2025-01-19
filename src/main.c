@@ -162,7 +162,7 @@ void render (SDL_Window *window, SDL_Renderer *renderer)
 		SDL_LockTexture(texture, NULL, &pixels, &pitch);
 	}
 
-	double vanishDist = sqrt((MAP_WIDTH - 2) * (MAP_WIDTH - 2) + (MAP_HEIGHT - 2) * (MAP_HEIGHT - 2));
+	double vanishDist = 5;
 
 	static const double HFOV = PI / 2; // cannot be a multiple of π
 	double VFOV = 2 * atan(tan(HFOV / 2) * ((double)h / w));
@@ -202,7 +202,7 @@ void render (SDL_Window *window, SDL_Renderer *renderer)
 
 		double trueDist = side == 0 ? distX - deltaX : distY - deltaY;
 		double dist = trueDist * cos(player.dir - dir);
-		double percentVanishDist = (vanishDist - trueDist) / vanishDist;
+		double percentVanishDist = trueDist > vanishDist ? 0 : (vanishDist - trueDist) / vanishDist;
 
 		static const double wallHeight = 1;
 		double cameraHeight = 2 * tan(VFOV / 2);
