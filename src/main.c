@@ -179,6 +179,17 @@ void render (SDL_Window *window, SDL_Renderer *renderer)
 	SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
 	SDL_RenderClear(renderer);
 
+	SDL_PixelFormatEnum pixelformat = SDL_PIXELFORMAT_RGBA8888;
+
+	SDL_Texture *texture = SDL_CreateTexture(renderer, pixelformat, texturesOn ? SDL_TEXTUREACCESS_STREAMING : SDL_TEXTUREACCESS_TARGET, w, h);
+
+	void *pixels;
+	int pitch;
+	if (texturesOn) {
+		SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_BLEND);
+		SDL_LockTexture(texture, NULL, &pixels, &pitch);
+	}
+
 	static const double HFOV = PI / 2; // cannot be a multiple of π
 	double VFOV = 2 * atan(tan(HFOV / 2) * ((double)h / w));
 	for (int i = 0; i < w; i++) {
@@ -243,6 +254,7 @@ void render (SDL_Window *window, SDL_Renderer *renderer)
 			int x = wallX * TEXTURE_SIZE;
 			uint32_t *column = textures[type - 1][x];
 
+			uint32_t *upixels = (uint32_t *)pixels;
 			for (int j = max(lineStart, 0); j < min(lineEnd, h); j++) {
 				int y = (double)(j - lineStart) / (lineEnd - lineStart) * TEXTURE_SIZE;
 				int c = column[y];
@@ -256,8 +268,14 @@ void render (SDL_Window *window, SDL_Renderer *renderer)
 				a *= percentMaxDist;
 				c &= 0xffffff00;
 				c |= a;
-				setRenderDrawColor(renderer, c);
-				SDL_RenderDrawPoint(renderer, w - i - 1, j);
+
+				SDL_PixelFormat *format = SDL_AllocFormat(pixelformat);
+				upixels[w - i - 1 + j * w] = SDL_MapRGBA(format,
+					(c & 0xff000000) >> 24,
+					(c & 0x00ff0000) >> 16,
+					(c & 0x0000ff00) >> 8,
+					c & 0xff
+				);
 			}
 		} else {
 			uint32_t color;
@@ -277,13 +295,22 @@ void render (SDL_Window *window, SDL_Renderer *renderer)
 			a *= percentMaxDist;
 			color &= 0xffffff00;
 			color |= a;
+			SDL_SetRenderTarget(renderer, texture);
 			setRenderDrawColor(renderer, color);
 			SDL_RenderDrawLineF(renderer,
 				w - i - 1, max(lineStart, 0),
 				w - i - 1, min(lineEnd, h)
 			);
+			SDL_SetRenderTarget(renderer, NULL);
 		}
 	}
+
+	if (texturesOn) {
+		SDL_UnlockTexture(texture);
+	}
+	SDL_RenderCopy(renderer, texture, NULL, NULL);
+	SDL_DestroyTexture(texture);
+	texture = NULL;
 
 	SDL_RenderPresent(renderer);
 }
