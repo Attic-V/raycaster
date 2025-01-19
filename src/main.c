@@ -134,7 +134,7 @@ void initTextures (void)
 				textures[2][x][y] = ((0x44 - c) << 24) | ((0x88 - c) << 16) | ((0xff - c) << 8) | 0xff;
 			}
 			{
-				const int mortar = TEXTURE_SIZE / 128;
+				const int mortar = max(TEXTURE_SIZE / 128, TEXTURE_SIZE >= 32 ? 1 : 0);
 				const int brickH = TEXTURE_SIZE / 16;
 				const int brickW = brickH * 2;
 				uint32_t white = (rand() % (0xdd - 0xbb + 1) + 0xbb) * 0x01010100 | 0xff;
