@@ -201,8 +201,9 @@ void render (SDL_Window *window, SDL_Renderer *renderer)
 		}
 
 		double trueDist = side == 0 ? distX - deltaX : distY - deltaY;
+		if (trueDist > vanishDist) continue;
 		double dist = trueDist * cos(player.dir - dir);
-		double percentVanishDist = trueDist > vanishDist ? 0 : (vanishDist - trueDist) / vanishDist;
+		double percentVanishDist = (vanishDist - trueDist) / vanishDist;
 
 		static const double wallHeight = 1;
 		double cameraHeight = 2 * tan(VFOV / 2);
