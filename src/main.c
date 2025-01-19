@@ -121,7 +121,7 @@ void initTextures (void)
 	for (int y = 0; y < TEXTURE_SIZE; y++) {
 		for (int x = 0; x < TEXTURE_SIZE; x++) {
 			{
-				int c = 0xff * (abs(y - x) > 4);
+				int c = 0xff * (abs(y - x) > 4 && abs(TEXTURE_SIZE - x - y) > 4);
 				textures[0][x][y] = c << 24 | 0xff;
 			}
 			{
