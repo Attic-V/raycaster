@@ -10,7 +10,7 @@
 #define PI 3.1415926535897932384626433
 
 #define TEXTURE_SIZE 256
-#define TEXTURE_COUNT 4
+#define TEXTURE_COUNT 5
 
 void initTextures (void);
 void move (double frameTime);
@@ -137,16 +137,23 @@ void initTextures (void)
 				const int mortar = max(TEXTURE_SIZE / 128, TEXTURE_SIZE >= 32 ? 1 : 0);
 				const int brickH = TEXTURE_SIZE / 16;
 				const int brickW = brickH * 2;
+				const double offset = 0.8;
 				uint32_t white = (rand() % (0xdd - 0xbb + 1) + 0xbb) * 0x01010100 | 0xff;
 				uint32_t red = (rand() % (0xbb - 0x55 + 1) + 0x55) << 24 | 0x003020ff;
 				if ((y + mortar / 2) % brickH < mortar) {
 					textures[3][x][y] = white;
 				} else {
-					if ((x + mortar / 2 + (int)((y) / brickH * brickH * 0.8)) % brickW < mortar) {
+					if ((x + mortar / 2 + (int)((y) / brickH * brickH * offset)) % brickW < mortar) {
 						textures[3][x][y] = white;
 					} else {
 						textures[3][x][y] = red;
 					}
+				}
+
+				if (((x + (int)(y / brickH * brickH * offset) % brickW) / brickW * brickW) < TEXTURE_SIZE * 0.2) {
+					textures[4][x][y] = textures[3][x][y];
+				} else {
+					textures[4][x][y] = textures[0][x][y];
 				}
 			}
 		}
