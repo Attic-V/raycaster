@@ -121,15 +121,16 @@ void initTextures (void)
 	for (int y = 0; y < TEXTURE_SIZE; y++) {
 		for (int x = 0; x < TEXTURE_SIZE; x++) {
 			{
-				int c = 0xff * (abs(y - x) > 4 && abs(TEXTURE_SIZE - x - y) > 4);
+				const int lineWidth = TEXTURE_SIZE / 64;
+				int c = 0xff * (abs(y - x) > lineWidth && abs(TEXTURE_SIZE - x - y) > lineWidth);
 				textures[0][x][y] = c << 24 | 0xff;
 			}
 			{
-				int c = (y + x) % TEXTURE_SIZE;
+				int c = ((y + x) % TEXTURE_SIZE) / ((double)TEXTURE_SIZE / 256);
 				textures[1][x][y] = ((0x44 - c) << 24) | ((0x88 - c) << 16) | ((0xff - c) << 8) | 0xff;
 			}
 			{
-				int c = y;
+				int c = y / ((double)TEXTURE_SIZE / 256);
 				textures[2][x][y] = ((0x44 - c) << 24) | ((0x88 - c) << 16) | ((0xff - c) << 8) | 0xff;
 			}
 			{
