@@ -11,8 +11,11 @@ void initTextures (void)
 		for (int x = 0; x < TEXTURE_SIZE; x++) {
 			{
 				const int lineWidth = TEXTURE_SIZE / 64;
-				int c = 0xff * (abs(y - x) > lineWidth && abs(TEXTURE_SIZE - x - y) > lineWidth);
-				textures[0][x][y] = c << 24 | 0xff;
+				if (abs(y - x) > lineWidth && abs(TEXTURE_SIZE - x - y) > lineWidth) {
+					textures[0][x][y] = 0xff0044ff;
+				} else {
+					textures[0][x][y] = 0xffffffff;
+				}
 			}
 			{
 				int c = ((y + x) % TEXTURE_SIZE) / ((double)TEXTURE_SIZE / 256);
