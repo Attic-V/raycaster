@@ -133,14 +133,15 @@ void initTextures (void)
 				textures[2][x][y] = ((0x44 - c) << 24) | ((0x88 - c) << 16) | ((0xff - c) << 8) | 0xff;
 			}
 			{
+				const int mortar = TEXTURE_SIZE / 128;
 				const int brickH = TEXTURE_SIZE / 16;
 				const int brickW = brickH * 2;
 				uint32_t white = (rand() % (0xdd - 0xbb + 1) + 0xbb) * 0x01010100 | 0xff;
 				uint32_t red = (rand() % (0xbb - 0x55 + 1) + 0x55) << 24 | 0x003020ff;
-				if ((y + 1) % brickH < 2) {
+				if ((y + mortar / 2) % brickH < mortar) {
 					textures[3][x][y] = white;
 				} else {
-					if ((x + 1 + (int)((y) / brickH * brickH * 0.8)) % brickW < 2) {
+					if ((x + mortar / 2 + (int)((y) / brickH * brickH * 0.8)) % brickW < mortar) {
 						textures[3][x][y] = white;
 					} else {
 						textures[3][x][y] = red;
