@@ -82,11 +82,12 @@ void initTexColors (void)
 				max = colors[color = c];
 			}
 		}
-		texcolor[t] =
+		uint32_t rgba =
 			((color & 0xf000) << 16) |
 			((color & 0x0f00) << 12) |
 			((color & 0x00f0) <<  8) |
 			((color & 0x000f) <<  4)
 		;
+		texcolor[t] = (rgba & 0xffffff00) == 0 ? 0x111111ff : rgba;
 	}
 }
