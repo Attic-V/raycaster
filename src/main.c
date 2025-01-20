@@ -167,6 +167,10 @@ void render (SDL_Window *window, SDL_Renderer *renderer)
 
 	static const double HFOV = PI / 2; // cannot be a multiple of π
 	double VFOV = 2 * atan(tan(HFOV / 2) * ((double)h / w));
+
+	double cameraHeight = 2 * tan(VFOV / 2);
+	static const double wallHeight = 1;
+
 	for (int i = 0; i <= w; i++) {
 		double cameraWidth = 2 * tan(HFOV / 2);
 		double cameraX = cameraWidth * i / (double)w - cameraWidth / 2;
@@ -206,8 +210,6 @@ void render (SDL_Window *window, SDL_Renderer *renderer)
 		double dist = trueDist * cos(player.dir - dir);
 		double percentVanishDist = (vanishDist - trueDist) / vanishDist;
 
-		static const double wallHeight = 1;
-		double cameraHeight = 2 * tan(VFOV / 2);
 		double windowY = (wallHeight / 2) / dist;
 		double screenWallHeight = h * (windowY * 2) / cameraHeight;
 
