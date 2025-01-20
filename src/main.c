@@ -152,17 +152,18 @@ void render (SDL_Window *window, SDL_Renderer *renderer)
 	SDL_RenderClear(renderer);
 
 	SDL_PixelFormatEnum pixelformat = SDL_PIXELFORMAT_RGBA8888;
+	SDL_PixelFormat *format = SDL_AllocFormat(pixelformat);
 
-	SDL_Texture *texture = SDL_CreateTexture(renderer, pixelformat, texturesOn ? SDL_TEXTUREACCESS_STREAMING : SDL_TEXTUREACCESS_TARGET, w, h);
+	SDL_Texture *texture = SDL_CreateTexture(renderer, pixelformat, SDL_TEXTUREACCESS_STREAMING, w, h);
 
 	void *pixels;
 	int pitch;
-	if (texturesOn) {
-		SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_BLEND);
-		SDL_LockTexture(texture, NULL, &pixels, &pitch);
-	}
+	SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_BLEND);
+	SDL_LockTexture(texture, NULL, &pixels, &pitch);
+	uint32_t *upixels = (uint32_t *)pixels;
 
 	double vanishDist = 5;
+	double wallBrightnessDiff = 0.9;
 
 	static const double HFOV = PI / 2; // cannot be a multiple of π
 	double VFOV = 2 * atan(tan(HFOV / 2) * ((double)h / w));
@@ -228,54 +229,40 @@ void render (SDL_Window *window, SDL_Renderer *renderer)
 			int x = wallX * TEXTURE_SIZE;
 			uint32_t *column = textures[type - 1][x];
 
-			uint32_t *upixels = (uint32_t *)pixels;
 			for (int j = max(lineStart, 0); j < min(lineEnd, h); j++) {
 				int y = (double)(j - lineStart) / (lineEnd - lineStart) * TEXTURE_SIZE;
-				int c = column[y];
+				uint32_t color = column[y];
 				if (side) {
-					uint8_t a = c & 0xff;
-					a *= 0.9;
-					c &= 0xffffff00;
-					c |= a;
-				};
-				uint8_t a = c & 0xff;
-				a *= percentVanishDist;
-				c &= 0xffffff00;
-				c |= a;
+					color = (color & 0xffffff00) | (uint8_t)((color & 0xff) * wallBrightnessDiff);
+				}
+				color = (color & 0xffffff00) | (uint8_t)((color & 0xff) * percentVanishDist);
 
-				SDL_PixelFormat *format = SDL_AllocFormat(pixelformat);
 				upixels[w - i + j * w] = SDL_MapRGBA(format,
-					(c & 0xff000000) >> 24,
-					(c & 0x00ff0000) >> 16,
-					(c & 0x0000ff00) >> 8,
-					c & 0xff
+					(color & 0xff000000) >> 24,
+					(color & 0x00ff0000) >> 16,
+					(color & 0x0000ff00) >> 8,
+					color & 0xff
 				);
 			}
 		} else {
 			uint32_t color = texcolor[type - 1];
 			if (side) {
-				uint8_t a = color & 0xff;
-				a *= 0.9;
-				color &= 0xffffff00;
-				color |= a;
-			};
-			uint8_t a = color & 0xff;
-			a *= percentVanishDist;
-			color &= 0xffffff00;
-			color |= a;
-			SDL_SetRenderTarget(renderer, texture);
-			setRenderDrawColor(renderer, color);
-			SDL_RenderDrawLineF(renderer,
-				w - i, max(lineStart, 0),
-				w - i, min(lineEnd - 1, h)
-			);
-			SDL_SetRenderTarget(renderer, NULL);
+				color = (color & 0xffffff00) | (uint8_t)((color & 0xff) * wallBrightnessDiff);
+			}
+			color = (color & 0xffffff00) | (uint8_t)((color & 0xff) * percentVanishDist);
+
+			for (int j = max(lineStart, 0); j < min(lineEnd, h); j++) {
+				upixels[w - i + j * w] = SDL_MapRGBA(format,
+					(color & 0xff000000) >> 24,
+					(color & 0x00ff0000) >> 16,
+					(color & 0x0000ff00) >> 8,
+					color & 0xff
+				);
+			}
 		}
 	}
 
-	if (texturesOn) {
-		SDL_UnlockTexture(texture);
-	}
+	SDL_UnlockTexture(texture);
 	SDL_RenderCopy(renderer, texture, NULL, NULL);
 	SDL_DestroyTexture(texture);
 	texture = NULL;
