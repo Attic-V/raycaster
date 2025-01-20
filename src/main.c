@@ -252,13 +252,7 @@ void render (SDL_Window *window, SDL_Renderer *renderer)
 				);
 			}
 		} else {
-			uint32_t color;
-			switch (type) {
-				case 1: color = 0xff0000ff; break;
-				case 2: color = 0x00ff00ff; break;
-				case 3: color = 0x0000ffff; break;
-				default: color = 0xffffffff;
-			}
+			uint32_t color = texcolor[type - 1];
 			if (side) {
 				uint8_t a = color & 0xff;
 				a *= 0.9;

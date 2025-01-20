@@ -7,6 +7,7 @@
 #define TEXTURE_COUNT 7
 
 extern uint32_t textures[TEXTURE_COUNT][TEXTURE_SIZE][TEXTURE_SIZE];
+extern uint32_t texcolor[TEXTURE_COUNT];
 
 void initTextures (void);
 

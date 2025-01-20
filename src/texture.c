@@ -3,7 +3,10 @@
 #include "texture.h"
 #include "utils.h"
 
+void initTexColors (void);
+
 uint32_t textures[TEXTURE_COUNT][TEXTURE_SIZE][TEXTURE_SIZE];
+uint32_t texcolor[TEXTURE_COUNT];
 
 void initTextures (void)
 {
@@ -54,5 +57,32 @@ void initTextures (void)
 				textures[6][x][y] = ((x ^ y) << 24) | 0xff;
 			}
 		}
+	}
+	initTexColors();
+}
+
+void initTexColors (void)
+{
+	for (int t = 0; t < TEXTURE_COUNT; t++) {
+		uint64_t r = 0;
+		uint64_t g = 0;
+		uint64_t b = 0;
+		for (int y = 0; y < TEXTURE_SIZE; y++) {
+			for (int x = 0; x < TEXTURE_SIZE; x++) {
+				if (x + y == 0) {
+					r = (textures[t][x][y] & 0xff000000) >> 24;
+					g = (textures[t][x][y] & 0xff0000) >> 16;
+					b = (textures[t][x][y] & 0xff00) >> 8;
+				} else {
+					r += (textures[t][x][y] & 0xff000000) >> 24;
+					g += (textures[t][x][y] & 0xff0000) >> 16;
+					b += (textures[t][x][y] & 0xff00) >> 8;
+				}
+			}
+		}
+		r /= TEXTURE_SIZE;
+		g /= TEXTURE_SIZE;
+		b /= TEXTURE_SIZE;
+		texcolor[t] = (r << 24) | (g << 16) | (b << 8) | 0xff;
 	}
 }
