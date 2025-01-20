@@ -83,10 +83,10 @@ void initTexColors (void)
 			}
 		}
 		uint32_t rgba =
-			((color & 0xf000) << 16) |
-			((color & 0x0f00) << 12) |
-			((color & 0x00f0) <<  8) |
-			((color & 0x000f) <<  4)
+			((color & 0xf000) * 0x00011000) |
+			((color & 0x0f00) * 0x00001100) |
+			((color & 0x00f0) * 0x00000110) |
+			((color & 0x000f) * 0x00000011)
 		;
 		texcolor[t] = (rgba & 0xffffff00) == 0 ? 0x111111ff : rgba;
 	}
