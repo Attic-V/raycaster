@@ -171,7 +171,7 @@ void render (SDL_Window *window, SDL_Renderer *renderer)
 	double cameraHeight = 2 * tan(VFOV / 2);
 	static const double wallHeight = 1;
 
-	for (int i = 0; i <= w; i++) {
+	for (int i = 0; i < w; i++) {
 		double cameraWidth = 2 * tan(HFOV / 2);
 		double cameraX = cameraWidth * i / (double)w - cameraWidth / 2;
 
@@ -239,7 +239,7 @@ void render (SDL_Window *window, SDL_Renderer *renderer)
 				}
 				color = (color & 0xffffff00) | (uint8_t)((color & 0xff) * percentVanishDist);
 
-				upixels[w - i + j * w] = SDL_MapRGBA(format,
+				upixels[w - i - 1 + j * w] = SDL_MapRGBA(format,
 					(color & 0xff000000) >> 24,
 					(color & 0x00ff0000) >> 16,
 					(color & 0x0000ff00) >> 8,
@@ -254,7 +254,7 @@ void render (SDL_Window *window, SDL_Renderer *renderer)
 			color = (color & 0xffffff00) | (uint8_t)((color & 0xff) * percentVanishDist);
 
 			for (int j = max(lineStart, 0); j < min(lineEnd, h); j++) {
-				upixels[w - i + j * w] = SDL_MapRGBA(format,
+				upixels[w - i - 1 + j * w] = SDL_MapRGBA(format,
 					(color & 0xff000000) >> 24,
 					(color & 0x00ff0000) >> 16,
 					(color & 0x0000ff00) >> 8,
