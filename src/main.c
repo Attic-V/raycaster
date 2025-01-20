@@ -213,7 +213,7 @@ void render (SDL_Window *window, SDL_Renderer *renderer)
 		int type = map[mapY][mapX];
 
 		int lineStart = h / 2 - screenWallHeight / 2;
-		int lineEnd = h / 2 + screenWallHeight / 2;
+		int lineEnd = h / 2 + screenWallHeight / 2 + 1;
 		if (texturesOn) {
 			double collideX = player.x + cos(dir) * trueDist;
 			double collideY = player.y - sin(dir) * trueDist;
@@ -267,7 +267,7 @@ void render (SDL_Window *window, SDL_Renderer *renderer)
 			setRenderDrawColor(renderer, color);
 			SDL_RenderDrawLineF(renderer,
 				w - i - 1, max(lineStart, 0),
-				w - i - 1, min(lineEnd, h)
+				w - i - 1, min(lineEnd - 1, h)
 			);
 			SDL_SetRenderTarget(renderer, NULL);
 		}
