@@ -64,25 +64,29 @@ void initTextures (void)
 void initTexColors (void)
 {
 	for (int t = 0; t < TEXTURE_COUNT; t++) {
-		uint64_t r = 0;
-		uint64_t g = 0;
-		uint64_t b = 0;
+		uint16_t *colors = calloc(0x10000, sizeof(uint16_t));
 		for (int y = 0; y < TEXTURE_SIZE; y++) {
 			for (int x = 0; x < TEXTURE_SIZE; x++) {
-				if (x + y == 0) {
-					r = (textures[t][x][y] & 0xff000000) >> 24;
-					g = (textures[t][x][y] & 0xff0000) >> 16;
-					b = (textures[t][x][y] & 0xff00) >> 8;
-				} else {
-					r += (textures[t][x][y] & 0xff000000) >> 24;
-					g += (textures[t][x][y] & 0xff0000) >> 16;
-					b += (textures[t][x][y] & 0xff00) >> 8;
-				}
+				uint32_t color = textures[t][x][y];
+				colors[
+					((color & 0xf0000000) >> 16) |
+					((color & 0x00f00000) >> 12) |
+					((color & 0x0000f000) >>  8) |
+					((color & 0x000000f0) >>  4)
+				]++;
 			}
 		}
-		r /= TEXTURE_SIZE;
-		g /= TEXTURE_SIZE;
-		b /= TEXTURE_SIZE;
-		texcolor[t] = (r << 24) | (g << 16) | (b << 8) | 0xff;
+		uint16_t color;
+		for (int c = 0, max = 0; c < 0x10000; c++) {
+			if (colors[c] > max) {
+				max = colors[color = c];
+			}
+		}
+		texcolor[t] =
+			((color & 0xf000) << 16) |
+			((color & 0x0f00) << 12) |
+			((color & 0x00f0) <<  8) |
+			((color & 0x000f) <<  4)
+		;
 	}
 }
