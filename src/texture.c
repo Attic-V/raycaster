@@ -64,7 +64,7 @@ void initTextures (void)
 void initTexColors (void)
 {
 	for (int t = 0; t < TEXTURE_COUNT; t++) {
-		uint16_t *colors = calloc(0x10000, sizeof(uint16_t));
+		uint16_t *colors = calloc(1 << sizeof(uint16_t) * 8, sizeof(uint16_t));
 		for (int y = 0; y < TEXTURE_SIZE; y++) {
 			for (int x = 0; x < TEXTURE_SIZE; x++) {
 				uint32_t color = textures[t][x][y];
@@ -77,7 +77,7 @@ void initTexColors (void)
 			}
 		}
 		uint16_t color;
-		for (int c = 0, max = 0; c < 0x10000; c++) {
+		for (int c = 0, max = 0; c < 1 << sizeof(uint16_t) * 8; c++) {
 			if (colors[c] > max) {
 				max = colors[color = c];
 			}
