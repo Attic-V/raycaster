@@ -166,7 +166,7 @@ void render (SDL_Window *window, SDL_Renderer *renderer)
 
 	static const double HFOV = PI / 2; // cannot be a multiple of π
 	double VFOV = 2 * atan(tan(HFOV / 2) * ((double)h / w));
-	for (int i = 0; i < w; i++) {
+	for (int i = 0; i <= w; i++) {
 		double cameraWidth = 2 * tan(HFOV / 2);
 		double cameraX = cameraWidth * i / (double)w - cameraWidth / 2;
 
@@ -244,7 +244,7 @@ void render (SDL_Window *window, SDL_Renderer *renderer)
 				c |= a;
 
 				SDL_PixelFormat *format = SDL_AllocFormat(pixelformat);
-				upixels[w - i - 1 + j * w] = SDL_MapRGBA(format,
+				upixels[w - i + j * w] = SDL_MapRGBA(format,
 					(c & 0xff000000) >> 24,
 					(c & 0x00ff0000) >> 16,
 					(c & 0x0000ff00) >> 8,
@@ -266,8 +266,8 @@ void render (SDL_Window *window, SDL_Renderer *renderer)
 			SDL_SetRenderTarget(renderer, texture);
 			setRenderDrawColor(renderer, color);
 			SDL_RenderDrawLineF(renderer,
-				w - i - 1, max(lineStart, 0),
-				w - i - 1, min(lineEnd - 1, h)
+				w - i, max(lineStart, 0),
+				w - i, min(lineEnd - 1, h)
 			);
 			SDL_SetRenderTarget(renderer, NULL);
 		}
