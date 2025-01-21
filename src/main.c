@@ -286,13 +286,20 @@ void render (SDL_Window *window, SDL_Renderer *renderer)
 			int texX = tileX * TEXTURE_SIZE;
 			int texY = tileY * TEXTURE_SIZE;
 
-			uint32_t color = textures[6][texX][texY];
+			uint32_t floorColor = textures[6][texX][texY];
+			uint32_t ceilingColor = textures[7][texX][texY];
 
 			upixels[w - i - 1 + y * w] = SDL_MapRGBA(format,
-				(color & 0xff000000) >> 24,
-				(color & 0x00ff0000) >> 16,
-				(color & 0x0000ff00) >> 8,
-				(color & 0xff) * percentVanishDist
+				(floorColor & 0xff000000) >> 24,
+				(floorColor & 0x00ff0000) >> 16,
+				(floorColor & 0x0000ff00) >> 8,
+				(floorColor & 0xff) * percentVanishDist
+			);
+			upixels[w - i - 1 + (h - y - 1) * w] = SDL_MapRGBA(format,
+				(ceilingColor & 0xff000000) >> 24,
+				(ceilingColor & 0x00ff0000) >> 16,
+				(ceilingColor & 0x0000ff00) >> 8,
+				(ceilingColor & 0xff) * percentVanishDist
 			);
 		}
 	}
