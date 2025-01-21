@@ -218,49 +218,52 @@ void render (SDL_Window *window, SDL_Renderer *renderer)
 
 		int lineStart = h / 2 - screenWallHeight / 2;
 		int lineEnd = h / 2 + screenWallHeight / 2 + 1;
-		if (texturesOn) {
-			double collideX = player.x + cos(dir) * trueDist;
-			double collideY = player.y - sin(dir) * trueDist;
 
-			double wallX =
-				side == 0
-					? (sX < 0 ? 1 - collideY + (int)collideY : collideY - (int)collideY)
-					: (sY < 0 ? collideX - (int)collideX : 1 - collideX + (int)collideX)
-				;
-			wallX = fabs(wallX);
+		if (percentVanishDist > 0) {
+			if (texturesOn) {
+				double collideX = player.x + cos(dir) * trueDist;
+				double collideY = player.y - sin(dir) * trueDist;
 
-			int x = wallX * TEXTURE_SIZE;
-			uint32_t *column = textures[type - 1][x];
+				double wallX =
+					side == 0
+						? (sX < 0 ? 1 - collideY + (int)collideY : collideY - (int)collideY)
+						: (sY < 0 ? collideX - (int)collideX : 1 - collideX + (int)collideX)
+					;
+				wallX = fabs(wallX);
 
-			for (int j = max(lineStart, 0); j < min(lineEnd, h); j++) {
-				int y = (double)(j - lineStart) / (lineEnd - lineStart) * TEXTURE_SIZE;
-				uint32_t color = column[y];
+				int x = wallX * TEXTURE_SIZE;
+				uint32_t *column = textures[type - 1][x];
+
+				for (int j = max(lineStart, 0); j < min(lineEnd, h); j++) {
+					int y = (double)(j - lineStart) / (lineEnd - lineStart) * TEXTURE_SIZE;
+					uint32_t color = column[y];
+					if (side) {
+						color = (color & 0xffffff00) | (uint8_t)((color & 0xff) * wallBrightnessDiff);
+					}
+					color = (color & 0xffffff00) | (uint8_t)((color & 0xff) * percentVanishDist);
+
+					upixels[w - i - 1 + j * w] = SDL_MapRGBA(format,
+						(color & 0xff000000) >> 24,
+						(color & 0x00ff0000) >> 16,
+						(color & 0x0000ff00) >> 8,
+						color & 0xff
+					);
+				}
+			} else {
+				uint32_t color = texcolor[type - 1];
 				if (side) {
 					color = (color & 0xffffff00) | (uint8_t)((color & 0xff) * wallBrightnessDiff);
 				}
 				color = (color & 0xffffff00) | (uint8_t)((color & 0xff) * percentVanishDist);
 
-				upixels[w - i - 1 + j * w] = SDL_MapRGBA(format,
-					(color & 0xff000000) >> 24,
-					(color & 0x00ff0000) >> 16,
-					(color & 0x0000ff00) >> 8,
-					color & 0xff
-				);
-			}
-		} else {
-			uint32_t color = texcolor[type - 1];
-			if (side) {
-				color = (color & 0xffffff00) | (uint8_t)((color & 0xff) * wallBrightnessDiff);
-			}
-			color = (color & 0xffffff00) | (uint8_t)((color & 0xff) * percentVanishDist);
-
-			for (int j = max(lineStart, 0); j < min(lineEnd, h); j++) {
-				upixels[w - i - 1 + j * w] = SDL_MapRGBA(format,
-					(color & 0xff000000) >> 24,
-					(color & 0x00ff0000) >> 16,
-					(color & 0x0000ff00) >> 8,
-					color & 0xff
-				);
+				for (int j = max(lineStart, 0); j < min(lineEnd, h); j++) {
+					upixels[w - i - 1 + j * w] = SDL_MapRGBA(format,
+						(color & 0xff000000) >> 24,
+						(color & 0x00ff0000) >> 16,
+						(color & 0x0000ff00) >> 8,
+						color & 0xff
+					);
+				}
 			}
 		}
 
@@ -272,7 +275,7 @@ void render (SDL_Window *window, SDL_Renderer *renderer)
 			double trueDist = dist / cos(player.dir - dir);
 
 			double percentVanishDist = (vanishDist - trueDist) / vanishDist;
-			if (trueDist > vanishDist) percentVanishDist = 0;
+			if (trueDist > vanishDist) continue;
 
 			double collideX = player.x + trueDist * dirX;
 			double collideY = player.y - trueDist * dirY;
