@@ -168,11 +168,12 @@ void render (SDL_Window *window, SDL_Renderer *renderer)
 	static const double HFOV = PI / 2; // cannot be a multiple of π
 	double VFOV = 2 * atan(tan(HFOV / 2) * ((double)h / w));
 
+	double cameraWidth = 2 * tan(HFOV / 2);
 	double cameraHeight = 2 * tan(VFOV / 2);
+
 	static const double wallHeight = 1;
 
 	for (int i = 0; i < w; i++) {
-		double cameraWidth = 2 * tan(HFOV / 2);
 		double cameraX = cameraWidth * i / (double)w - cameraWidth / 2;
 
 		double dir = player.dir + PI / 2 - atan2(1, cameraX * (HFOV > PI ? -1 : 1));
@@ -206,9 +207,9 @@ void render (SDL_Window *window, SDL_Renderer *renderer)
 		}
 
 		double trueDist = side == 0 ? distX - deltaX : distY - deltaY;
-		if (trueDist > vanishDist) continue;
 		double dist = trueDist * cos(player.dir - dir);
 		double percentVanishDist = (vanishDist - trueDist) / vanishDist;
+		if (trueDist > vanishDist) percentVanishDist = 0;
 
 		double windowY = (wallHeight / 2) / dist;
 		double screenWallHeight = h * (windowY * 2) / cameraHeight;
@@ -261,6 +262,35 @@ void render (SDL_Window *window, SDL_Renderer *renderer)
 					color & 0xff
 				);
 			}
+		}
+
+		for (int y = lineEnd; y < h; y++) {
+			// floor casting does not work with h-fovs > pi
+			double screenPos = 2 * y - h;
+			double windowY = (screenPos * cameraHeight) / (h * 2);
+			double dist = wallHeight / (2 * windowY);
+			double trueDist = dist / cos(player.dir - dir);
+
+			double collideX = player.x + trueDist * dirX;
+			double collideY = player.y - trueDist * dirY;
+
+			int mapX = collideX;
+			int mapY = collideY;
+
+			double tileX = collideX - mapX;
+			double tileY = collideY - mapY;
+
+			int texX = tileX * TEXTURE_SIZE;
+			int texY = tileY * TEXTURE_SIZE;
+
+			uint32_t color = textures[6][texX][texY];
+
+			upixels[w - i - 1 + y * w] = SDL_MapRGBA(format,
+				(color & 0xff000000) >> 24,
+				(color & 0x00ff0000) >> 16,
+				(color & 0x0000ff00) >> 8,
+				color & 0xff
+			);
 		}
 	}
 
