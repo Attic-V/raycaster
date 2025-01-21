@@ -288,8 +288,11 @@ void render (SDL_Window *window, SDL_Renderer *renderer)
 			int texX = tileX * TEXTURE_SIZE;
 			int texY = tileY * TEXTURE_SIZE;
 
-			uint32_t floorColor = textures[6][texX][texY];
-			uint32_t ceilingColor = textures[7][texX][texY];
+			static const int floorTexture = 6;
+			static const int ceilingTexture = 7;
+
+			uint32_t floorColor = texturesOn ? textures[floorTexture][texX][texY] : texcolor[floorTexture];
+			uint32_t ceilingColor = texturesOn ? textures[ceilingTexture][texX][texY] : texcolor[ceilingTexture];
 
 			upixels[w - i - 1 + y * w] = SDL_MapRGBA(format,
 				(floorColor & 0xff000000) >> 24,
