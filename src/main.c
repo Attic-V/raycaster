@@ -271,6 +271,9 @@ void render (SDL_Window *window, SDL_Renderer *renderer)
 			double dist = wallHeight / (2 * windowY);
 			double trueDist = dist / cos(player.dir - dir);
 
+			double percentVanishDist = (vanishDist - trueDist) / vanishDist;
+			if (trueDist > vanishDist) percentVanishDist = 0;
+
 			double collideX = player.x + trueDist * dirX;
 			double collideY = player.y - trueDist * dirY;
 
@@ -289,7 +292,7 @@ void render (SDL_Window *window, SDL_Renderer *renderer)
 				(color & 0xff000000) >> 24,
 				(color & 0x00ff0000) >> 16,
 				(color & 0x0000ff00) >> 8,
-				color & 0xff
+				(color & 0xff) * percentVanishDist
 			);
 		}
 	}
