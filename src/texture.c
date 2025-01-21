@@ -56,6 +56,10 @@ void initTextures (void)
 			{
 				textures[6][x][y] = ((x ^ y) << 24) | 0xff;
 			}
+			{
+				int c = x ^ y;
+				textures[7][x][y] = (c << 24) |  (c << 16) | 0xff;
+			}
 		}
 	}
 	initTexColors();
