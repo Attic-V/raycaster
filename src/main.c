@@ -165,8 +165,8 @@ void render (SDL_Window *window, SDL_Renderer *renderer)
 	double vanishDist = 5;
 	double wallBrightnessDiff = 0.9;
 
-	static const double HFOV = PI / 2; // cannot be a multiple of π
-	double VFOV = 2 * atan(tan(HFOV / 2) * ((double)h / w));
+	static const double HFOV = PI / 2; // cannot be nπ/2 where n != 1
+	double VFOV = fabs(2 * atan(tan(HFOV / 2) * ((double)h / w)));
 
 	double cameraWidth = 2 * tan(HFOV / 2);
 	double cameraHeight = 2 * tan(VFOV / 2);
@@ -268,7 +268,6 @@ void render (SDL_Window *window, SDL_Renderer *renderer)
 		}
 
 		for (int y = lineEnd; y < h; y++) {
-			// floor casting does not work with h-fovs > pi
 			double screenPos = 2 * y - h;
 			double windowY = (screenPos * cameraHeight) / (h * 2);
 			double dist = wallHeight / (2 * windowY);
