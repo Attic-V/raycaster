@@ -145,6 +145,16 @@ void move (double frameTime)
 
 void render (SDL_Window *window, SDL_Renderer *renderer)
 {
+	#define RENDER_PIXEL(x, y, rgba8888) \
+		do { \
+			upixels[(x) + (y) * w] = SDL_MapRGBA(format, \
+				((rgba8888) & 0xff000000) >> 24, \
+				((rgba8888) & 0x00ff0000) >> 16, \
+				((rgba8888) & 0x0000ff00) >>  8, \
+				((rgba8888) & 0x000000ff) >>  0  \
+			); \
+		} while (0)
+
 	int w, h;
 	SDL_GetWindowSize(window, &w, &h);
 
@@ -242,12 +252,7 @@ void render (SDL_Window *window, SDL_Renderer *renderer)
 				color = texturesOn ? column[y] : texcolor[type - 1];
 				color = (color & 0xffffff00) | (uint8_t)((color & 0xff) * percentVanishDist * (side ? wallBrightnessDiff : 1));
 
-				upixels[w - i - 1 + j * w] = SDL_MapRGBA(format,
-					(color & 0xff000000) >> 24,
-					(color & 0x00ff0000) >> 16,
-					(color & 0x0000ff00) >> 8,
-					color & 0xff
-				);
+				RENDER_PIXEL(w - i - 1, j, color);
 			}
 		}
 
@@ -282,18 +287,11 @@ void render (SDL_Window *window, SDL_Renderer *renderer)
 			uint32_t floorColor = texturesOn ? textures[floorTex][texX][texY] : texcolor[floorTex];
 			uint32_t ceilingColor = texturesOn ? textures[ceilingTex][texX][texY] : texcolor[ceilingTex];
 
-			upixels[w - i - 1 + y * w] = SDL_MapRGBA(format,
-				(floorColor & 0xff000000) >> 24,
-				(floorColor & 0x00ff0000) >> 16,
-				(floorColor & 0x0000ff00) >> 8,
-				(floorColor & 0xff) * percentVanishDist
-			);
-			upixels[w - i - 1 + (h - y - 1) * w] = SDL_MapRGBA(format,
-				(ceilingColor & 0xff000000) >> 24,
-				(ceilingColor & 0x00ff0000) >> 16,
-				(ceilingColor & 0x0000ff00) >> 8,
-				(ceilingColor & 0xff) * percentVanishDist
-			);
+			floorColor = (floorColor & 0xffffff00) | (uint8_t)((floorColor & 0xff) * percentVanishDist);
+			ceilingColor = (ceilingColor & 0xffffff00) | (uint8_t)((ceilingColor & 0xff) * percentVanishDist);
+
+			RENDER_PIXEL(w - i - 1, y, floorColor);
+			RENDER_PIXEL(w - i - 1, h - y - 1, ceilingColor);
 		}
 	}
 
@@ -303,6 +301,8 @@ void render (SDL_Window *window, SDL_Renderer *renderer)
 	texture = NULL;
 
 	SDL_RenderPresent(renderer);
+
+	#undef RENDER_PIXEL
 }
 
 void setRenderDrawColor (SDL_Renderer *renderer, uint32_t color)
