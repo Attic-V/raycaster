@@ -195,6 +195,7 @@ void render (SDL_Window *window, SDL_Renderer *renderer)
 
 		int side = 0;
 		while (!map[mapY][mapX]) {
+			if (fmax(distX - deltaX, distY - deltaY) > vanishDist) break;
 			if (distX < distY) {
 				mapX += sX;
 				distX += deltaX;
