@@ -56,15 +56,19 @@ void initTextures (void)
 			{
 				if ((x > y && x > TEXTURE_SIZE - y) || (TEXTURE_SIZE - x > y && TEXTURE_SIZE - x > TEXTURE_SIZE - y)) {
 					textures[6][x][y] = 0xffffffff;
+					textures[8][x][y] = 0x008888ff;
 				} else {
 					textures[6][x][y] = 0x008888ff;
+					textures[8][x][y] = 0xffffffff;
 				}
 			}
 			{
 				if (x + TEXTURE_SIZE / 2 > y && x < y + TEXTURE_SIZE / 2 && TEXTURE_SIZE - x + TEXTURE_SIZE / 2 > y && TEXTURE_SIZE - x < y + TEXTURE_SIZE / 2) {
 					textures[7][x][y] = 0xffffffff;
+					textures[9][x][y] = 0x008888ff;
 				} else {
 					textures[7][x][y] = 0x008888ff;
+					textures[9][x][y] = 0xffffffff;
 				}
 			}
 		}
