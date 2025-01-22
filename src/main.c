@@ -165,7 +165,7 @@ void render (SDL_Window *window, SDL_Renderer *renderer)
 	double vanishDist = 5;
 	double wallBrightnessDiff = 0.9;
 
-	static const double HFOV = PI / 2; // cannot be nπ/2 where n != 1
+	static const double HFOV = PI / 2;
 	double VFOV = fabs(2 * atan(tan(HFOV / 2) * ((double)h / w)));
 
 	double cameraWidth = 2 * tan(HFOV / 2);
