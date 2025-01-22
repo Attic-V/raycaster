@@ -52,7 +52,7 @@ int main (void)
 	player = (Player){
 		.x = 1.5,
 		.y = 1.5,
-		.dir = 0,
+		.dir = -PI / 9,
 	};
 
 	double time = 0;
