@@ -61,8 +61,11 @@ void initTextures (void)
 				}
 			}
 			{
-				int c = x ^ y;
-				textures[7][x][y] = (c << 24) |  (c << 16) | 0xff;
+				if (x + TEXTURE_SIZE / 2 > y && x < y + TEXTURE_SIZE / 2 && TEXTURE_SIZE - x + TEXTURE_SIZE / 2 > y && TEXTURE_SIZE - x < y + TEXTURE_SIZE / 2) {
+					textures[7][x][y] = 0xffffffff;
+				} else {
+					textures[7][x][y] = 0x008888ff;
+				}
 			}
 		}
 	}
