@@ -237,8 +237,8 @@ void render (SDL_Window *window, SDL_Renderer *renderer)
 		int lineEnd = h / 2 + screenWallHeight / 2 + 1;
 
 		if (percentVanishDist > 0) {
-			double collideX = player.x + cos(dir) * trueDist;
-			double collideY = player.y - sin(dir) * trueDist;
+			double collideX = player.x + dirX * trueDist;
+			double collideY = player.y - dirY * trueDist;
 
 			double wallX =
 				side == 0
