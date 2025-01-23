@@ -19,17 +19,20 @@ bool texturesOn = true;
 Player player;
 
 typedef enum {
-	KEY_w = (1 << 0),
-	KEY_a = (1 << 1),
-	KEY_s = (1 << 2),
-	KEY_d = (1 << 3),
-	KEY_COMMA = (1 << 4),
-	KEY_o = (1 << 5),
-	KEY_e = (1 << 6),
-	KEY_UP = (1 << 7),
-	KEY_LEFT = (1 << 8),
-	KEY_DOWN = (1 << 9),
-	KEY_RIGHT = (1 << 10),
+	#define KEY(key, idx) \
+		KEY_##key = (1 << idx)
+	KEY(w, 0),
+	KEY(a, 1),
+	KEY(s, 2),
+	KEY(d, 3),
+	KEY(COMMA, 4),
+	KEY(o, 5),
+	KEY(e, 6),
+	KEY(UP, 7),
+	KEY(LEFT, 8),
+	KEY(DOWN, 9),
+	KEY(RIGHT, 10),
+	#undef KEY
 } Keys;
 
 int keypresses = 0;
