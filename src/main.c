@@ -10,6 +10,9 @@
 
 #define PI 3.1415926535897932384626433
 
+#define ALPHA_REDUCE(rgba8888, percent) \
+	(((rgba8888) & 0xffffff00) | (uint8_t)(((rgba8888) & 0xff) * (percent)))
+
 void move (double frameTime);
 void render (SDL_Window *window, SDL_Renderer *renderer);
 void setRenderDrawColor (SDL_Renderer *renderer, uint32_t color);
@@ -253,7 +256,7 @@ void render (SDL_Window *window, SDL_Renderer *renderer)
 				int y = (double)(j - lineStart) / (lineEnd - lineStart) * TEXTURE_SIZE;
 
 				color = texturesOn ? column[y] : texcolor[type - 1];
-				color = (color & 0xffffff00) | (uint8_t)((color & 0xff) * percentVanishDist * (side ? wallBrightnessDiff : 1));
+				color = ALPHA_REDUCE(color, percentVanishDist * (side ? wallBrightnessDiff : 1));
 
 				RENDER_PIXEL(w - i - 1, j, color);
 			}
@@ -290,8 +293,8 @@ void render (SDL_Window *window, SDL_Renderer *renderer)
 			uint32_t floorColor = texturesOn ? textures[floorTex][texX][texY] : texcolor[floorTex];
 			uint32_t ceilingColor = texturesOn ? textures[ceilingTex][texX][texY] : texcolor[ceilingTex];
 
-			floorColor = (floorColor & 0xffffff00) | (uint8_t)((floorColor & 0xff) * percentVanishDist);
-			ceilingColor = (ceilingColor & 0xffffff00) | (uint8_t)((ceilingColor & 0xff) * percentVanishDist);
+			floorColor = ALPHA_REDUCE(floorColor, percentVanishDist);
+			ceilingColor = ALPHA_REDUCE(ceilingColor, percentVanishDist);
 
 			RENDER_PIXEL(w - i - 1, y, floorColor);
 			RENDER_PIXEL(w - i - 1, h - y - 1, ceilingColor);
