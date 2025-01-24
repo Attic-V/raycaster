@@ -74,33 +74,39 @@ int main (void)
 		;
 		if (event.type == SDL_KEYDOWN) {
 			switch (event.key.keysym.sym) {
-				case SDLK_w: keypresses |= KEY_w; break;
-				case SDLK_a: keypresses |= KEY_a; break;
-				case SDLK_s: keypresses |= KEY_s; break;
-				case SDLK_d: keypresses |= KEY_d; break;
-				case SDLK_COMMA: keypresses |= KEY_COMMA; break;
-				case SDLK_o: keypresses |= KEY_o; break;
-				case SDLK_e: keypresses |= KEY_e; break;
-				case SDLK_UP: keypresses |= KEY_UP; break;
-				case SDLK_LEFT: keypresses |= KEY_LEFT; break;
-				case SDLK_DOWN: keypresses |= KEY_DOWN; break;
-				case SDLK_RIGHT: keypresses |= KEY_RIGHT; break;
+				#define SET(key) \
+					case SDLK_##key: keypresses |= KEY_##key; break;
+				SET(w)
+				SET(a)
+				SET(s)
+				SET(d)
+				SET(COMMA)
+				SET(o)
+				SET(e)
+				SET(UP)
+				SET(LEFT)
+				SET(DOWN)
+				SET(RIGHT)
+				#undef SET
 			}
 		}
 		if (event.type == SDL_KEYUP) {
 			switch (event.key.keysym.sym) {
-				case SDLK_w: keypresses &= ~0 ^ KEY_w; break;
-				case SDLK_a: keypresses &= ~0 ^ KEY_a; break;
-				case SDLK_s: keypresses &= ~0 ^ KEY_s; break;
-				case SDLK_d: keypresses &= ~0 ^ KEY_d; break;
-				case SDLK_COMMA: keypresses &= ~0 ^ KEY_COMMA; break;
-				case SDLK_o: keypresses &= ~0 ^ KEY_o; break;
-				case SDLK_e: keypresses &= ~0 ^ KEY_e; break;
-				case SDLK_UP: keypresses &= ~0 ^ KEY_UP; break;
-				case SDLK_LEFT: keypresses &= ~0 ^ KEY_LEFT; break;
-				case SDLK_DOWN: keypresses &= ~0 ^ KEY_DOWN; break;
-				case SDLK_RIGHT: keypresses &= ~0 ^ KEY_RIGHT; break;
+				#define UNSET(key) \
+					case SDLK_##key: keypresses &= ~0 ^ KEY_##key; break;
+				UNSET(w)
+				UNSET(a)
+				UNSET(s)
+				UNSET(d)
+				UNSET(COMMA)
+				UNSET(o)
+				UNSET(e)
+				UNSET(UP)
+				UNSET(LEFT)
+				UNSET(DOWN)
+				UNSET(RIGHT)
 				case SDLK_SEMICOLON: texturesOn = !texturesOn; break;
+				#undef UNSET
 			}
 		}
 
