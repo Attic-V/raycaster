@@ -1,5 +1,6 @@
 #include <stdlib.h>
 
+#include "rgba.h"
 #include "texture.h"
 #include "utils.h"
 
@@ -82,13 +83,7 @@ void initTexColors (void)
 		uint16_t *colors = calloc(1 << sizeof(uint16_t) * 8, sizeof(uint16_t));
 		for (int y = 0; y < TEXTURE_SIZE; y++) {
 			for (int x = 0; x < TEXTURE_SIZE; x++) {
-				uint32_t color = textures[t][x][y];
-				colors[
-					((color & 0xf0000000) >> 16) |
-					((color & 0x00f00000) >> 12) |
-					((color & 0x0000f000) >>  8) |
-					((color & 0x000000f0) >>  4)
-				]++;
+				colors[rgba_8888to4444(textures[t][x][y])]++;
 			}
 		}
 		uint16_t color;
@@ -97,11 +92,6 @@ void initTexColors (void)
 				max = colors[color = c];
 			}
 		}
-		texcolor[t] =
-			((color & 0xf000) * 0x00011000) |
-			((color & 0x0f00) * 0x00001100) |
-			((color & 0x00f0) * 0x00000110) |
-			((color & 0x000f) * 0x00000011)
-		;
+		texcolor[t] = rgba_4444to8888(color);
 	}
 }
