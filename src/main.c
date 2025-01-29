@@ -252,9 +252,9 @@ void render (SDL_Window *window, SDL_Renderer *renderer)
 			wallX = fabs(wallX);
 
 			int x = wallX * TEXTURE_SIZE;
-			uint32_t *column = textures[type - 1][x];
+			RGBA8888 *column = textures[type - 1][x];
 
-			uint32_t color;
+			RGBA8888 color;
 
 			for (int j = max(lineStart, 0); j < min(lineEnd, h); j++) {
 				int y = (double)(j - lineStart) / (lineEnd - lineStart) * TEXTURE_SIZE;
@@ -294,8 +294,8 @@ void render (SDL_Window *window, SDL_Renderer *renderer)
 				: (mapX + mapY) % 2 == 0 ? 8 : 9
 			;
 
-			uint32_t floorColor = texturesOn ? textures[floorTex][texX][texY] : texcolor[floorTex];
-			uint32_t ceilingColor = texturesOn ? textures[ceilingTex][texX][texY] : texcolor[ceilingTex];
+			RGBA8888 floorColor = texturesOn ? textures[floorTex][texX][texY] : texcolor[floorTex];
+			RGBA8888 ceilingColor = texturesOn ? textures[ceilingTex][texX][texY] : texcolor[ceilingTex];
 
 			floorColor = rgba_alphaReduce(floorColor, percentVanishDist);
 			ceilingColor = rgba_alphaReduce(ceilingColor, percentVanishDist);
@@ -315,7 +315,7 @@ void render (SDL_Window *window, SDL_Renderer *renderer)
 	#undef RENDER_PIXEL
 }
 
-void setRenderDrawColor (SDL_Renderer *renderer, uint32_t color)
+void setRenderDrawColor (SDL_Renderer *renderer, RGBA8888 color)
 {
 	SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
 	SDL_SetRenderDrawColor(renderer,

@@ -1,28 +1,28 @@
 #include "rgba.h"
 
-uint16_t rgba_8888to4444 (uint32_t rgba8888)
+RGBA4444 rgba_8888to4444 (RGBA8888 rgba)
 {
 	return
-		((rgba8888 & 0xf0000000) >> 16) |
-		((rgba8888 & 0x00f00000) >> 12) |
-		((rgba8888 & 0x0000f000) >>  8) |
-		((rgba8888 & 0x000000f0) >>  4)
+		((rgba & 0xf0000000) >> 16) |
+		((rgba & 0x00f00000) >> 12) |
+		((rgba & 0x0000f000) >>  8) |
+		((rgba & 0x000000f0) >>  4)
 	;
 }
 
-uint32_t rgba_4444to8888 (uint16_t rgba4444)
+RGBA8888 rgba_4444to8888 (RGBA4444 rgba)
 {
 	return
-		((rgba4444 & 0xf000) * 0x00011000) |
-		((rgba4444 & 0x0f00) * 0x00001100) |
-		((rgba4444 & 0x00f0) * 0x00000110) |
-		((rgba4444 & 0x000f) * 0x00000011)
+		((rgba & 0xf000) * 0x00011000) |
+		((rgba & 0x0f00) * 0x00001100) |
+		((rgba & 0x00f0) * 0x00000110) |
+		((rgba & 0x000f) * 0x00000011)
 	;
 }
 
-uint32_t rgba_channelReduce (uint32_t rgba8888, RgbaChannel channel, double percent)
+RGBA8888 rgba_channelReduce (RGBA8888 rgba, RgbaChannel channel, double percent)
 {
-	uint32_t mask = channel;
+	RGBA8888 mask = channel;
 
 	uint8_t shift;
 	switch (channel) {
@@ -31,8 +31,8 @@ uint32_t rgba_channelReduce (uint32_t rgba8888, RgbaChannel channel, double perc
 		case RgbaChannel_B: shift =  8; break;
 		case RgbaChannel_A: shift =  0; break;
 		default:
-			return rgba8888;
+			return rgba;
 	}
 
-	return (rgba8888 & ~mask) | ((uint8_t)(percent * ((rgba8888 & mask) >> shift)) << shift);
+	return (rgba & ~mask) | ((uint8_t)(percent * ((rgba & mask) >> shift)) << shift);
 }

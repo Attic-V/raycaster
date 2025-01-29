@@ -6,8 +6,8 @@
 
 void initTexColors (void);
 
-uint32_t textures[TEXTURE_COUNT][TEXTURE_SIZE][TEXTURE_SIZE];
-uint32_t texcolor[TEXTURE_COUNT];
+RGBA8888 textures[TEXTURE_COUNT][TEXTURE_SIZE][TEXTURE_SIZE];
+RGBA8888 texcolor[TEXTURE_COUNT];
 
 void initTextures (void)
 {
@@ -34,8 +34,8 @@ void initTextures (void)
 				const int brickH = TEXTURE_SIZE / 16;
 				const int brickW = brickH * 2;
 				const double offset = 0.8;
-				uint32_t white = (rand() % (0xdd - 0xbb + 1) + 0xbb) * 0x01010100 | 0xff;
-				uint32_t red = (rand() % (0xbb - 0x55 + 1) + 0x55) << 24 | 0x003020ff;
+				RGBA8888 white = (rand() % (0xdd - 0xbb + 1) + 0xbb) * 0x01010100 | 0xff;
+				RGBA8888 red = (rand() % (0xbb - 0x55 + 1) + 0x55) << 24 | 0x003020ff;
 				if ((y + mortar / 2) % brickH < mortar) {
 					textures[3][x][y] = white;
 				} else {
@@ -80,14 +80,14 @@ void initTextures (void)
 void initTexColors (void)
 {
 	for (int t = 0; t < TEXTURE_COUNT; t++) {
-		uint16_t *colors = calloc(1 << sizeof(uint16_t) * 8, sizeof(uint16_t));
+		RGBA4444 *colors = calloc(1 << sizeof(RGBA4444) * 8, sizeof(RGBA4444));
 		for (int y = 0; y < TEXTURE_SIZE; y++) {
 			for (int x = 0; x < TEXTURE_SIZE; x++) {
 				colors[rgba_8888to4444(textures[t][x][y])]++;
 			}
 		}
-		uint16_t color;
-		for (int c = 0, max = 0; c < 1 << sizeof(uint16_t) * 8; c++) {
+		RGBA4444 color;
+		for (int c = 0, max = 0; c < 1 << sizeof(RGBA4444) * 8; c++) {
 			if (colors[c] > max) {
 				max = colors[color = c];
 			}
