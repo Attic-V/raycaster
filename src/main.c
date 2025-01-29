@@ -127,12 +127,16 @@ void move (double frameTime)
 	double movementspeed = 1.5 * frameTime;
 	double turnspeed = 2 * PI * 0.25 * frameTime;
 
-	bool move_forwards = (keypresses & KEY_w) | (keypresses & KEY_COMMA) | (keypresses & KEY_UP);
-	bool move_left = (keypresses & KEY_a);
-	bool move_backwards = (keypresses & KEY_s) | (keypresses & KEY_o) | (keypresses & KEY_DOWN);
-	bool move_right = (keypresses & KEY_d) | (keypresses & KEY_e);
-	bool turn_left = (keypresses & KEY_LEFT);
-	bool turn_right = (keypresses & KEY_RIGHT);
+	#define KEYSTATE(key) (keypresses & KEY_##key)
+
+	bool move_forwards = KEYSTATE(w) | KEYSTATE(COMMA) | KEYSTATE(UP);
+	bool move_left = KEYSTATE(a);
+	bool move_backwards = KEYSTATE(s) | KEYSTATE(o) | KEYSTATE(DOWN);
+	bool move_right = KEYSTATE(d) | KEYSTATE(e);
+	bool turn_left = KEYSTATE(LEFT);
+	bool turn_right = KEYSTATE(RIGHT);
+
+	#undef KEYSTATE
 
 	double move_x = movementspeed * (
 		move_forwards * cos(player.dir) +
