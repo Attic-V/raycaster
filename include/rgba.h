@@ -4,7 +4,7 @@
 #include <stdint.h>
 
 #define rgba_alphaReduce(rgba8888, percent) \
-	rgba_channelReduce(rgba8888, RgbaChannel_A, percent)
+	rgba_channelReduce((rgba8888), RgbaChannel_A, (percent))
 
 typedef uint32_t RGBA8888;
 typedef uint16_t RGBA4444;
