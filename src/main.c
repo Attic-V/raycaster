@@ -139,15 +139,15 @@ void move (double frameTime)
 	#undef KEYSTATE
 
 	double move_x = movementspeed * (
-		move_forwards * cos(player.dir) +
-		move_left * cos(player.dir + PI / 2) +
-		move_right * cos(player.dir - PI / 2) +
+		move_forwards  *  cos(player.dir) +
+		move_left      *  cos(player.dir + PI / 2) +
+		move_right     *  cos(player.dir - PI / 2) +
 		move_backwards * -cos(player.dir)
 	);
 	double move_y = movementspeed * (
-		move_forwards * sin(player.dir) +
-		move_left * sin(player.dir + PI / 2) +
-		move_right * sin(player.dir - PI / 2) +
+		move_forwards  *  sin(player.dir) +
+		move_left      *  sin(player.dir + PI / 2) +
+		move_right     *  sin(player.dir - PI / 2) +
 		move_backwards * -sin(player.dir)
 	);
 
