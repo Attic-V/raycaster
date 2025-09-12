@@ -1,5 +1,8 @@
 # raycaster
 
+## requirements
+* compiler with c23 support
+
 ## dependencies
 
 * SDL2

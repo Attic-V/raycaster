@@ -9,7 +9,7 @@
 typedef uint32_t RGBA8888;
 typedef uint16_t RGBA4444;
 
-typedef enum {
+typedef enum : uint32_t {
 	RgbaChannel_R = 0xff000000,
 	RgbaChannel_G = 0x00ff0000,
 	RgbaChannel_B = 0x0000ff00,
