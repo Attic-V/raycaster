@@ -15,8 +15,6 @@ void move (double frameTime);
 void render (SDL_Window *window, SDL_Renderer *renderer);
 void setRenderDrawColor (SDL_Renderer *renderer, uint32_t color);
 
-bool texturesOn = true;
-
 Player player;
 
 typedef enum {
@@ -103,7 +101,6 @@ int main (void)
 				UNSET(LEFT)
 				UNSET(DOWN)
 				UNSET(RIGHT)
-				case SDLK_SEMICOLON: texturesOn = !texturesOn; break;
 				#undef UNSET
 			}
 		}
@@ -263,7 +260,7 @@ void render (SDL_Window *window, SDL_Renderer *renderer)
 			for (int j = max(lineStart, 0); j < min(lineEnd, h); j++) {
 				int y = (double)(j - lineStart) / (lineEnd - lineStart) * TEXTURE_SIZE;
 
-				color = texturesOn ? column[y] : texcolor[type - 1];
+				color = column[y];
 				color = rgba_alphaReduce(color, percentVanishDist * (side ? wallBrightnessDiff : 1));
 
 				RENDER_PIXEL(w - i - 1, j, color);
@@ -298,8 +295,8 @@ void render (SDL_Window *window, SDL_Renderer *renderer)
 				: (mapX + mapY) % 2 == 0 ? 8 : 9
 			;
 
-			RGBA8888 floorColor = texturesOn ? textures[floorTex][texX][texY] : texcolor[floorTex];
-			RGBA8888 ceilingColor = texturesOn ? textures[ceilingTex][texX][texY] : texcolor[ceilingTex];
+			RGBA8888 floorColor = textures[floorTex][texX][texY];
+			RGBA8888 ceilingColor = textures[ceilingTex][texX][texY];
 
 			floorColor = rgba_alphaReduce(floorColor, percentVanishDist);
 			ceilingColor = rgba_alphaReduce(ceilingColor, percentVanishDist);

@@ -7,7 +7,6 @@
 void initTexColors (void);
 
 RGBA8888 textures[TEXTURE_COUNT][TEXTURE_SIZE][TEXTURE_SIZE];
-RGBA8888 texcolor[TEXTURE_COUNT];
 
 void initTextures (void)
 {
@@ -74,24 +73,5 @@ void initTextures (void)
 			}
 		}
 	}
-	initTexColors();
 }
 
-void initTexColors (void)
-{
-	for (int t = 0; t < TEXTURE_COUNT; t++) {
-		RGBA4444 *colors = calloc(1 << sizeof(RGBA4444) * 8, sizeof(RGBA4444));
-		for (int y = 0; y < TEXTURE_SIZE; y++) {
-			for (int x = 0; x < TEXTURE_SIZE; x++) {
-				colors[rgba_8888to4444(textures[t][x][y])]++;
-			}
-		}
-		RGBA4444 color;
-		for (int c = 0, max = 0; c < 1 << sizeof(RGBA4444) * 8; c++) {
-			if (colors[c] > max) {
-				max = colors[color = c];
-			}
-		}
-		texcolor[t] = rgba_4444to8888(color);
-	}
-}
