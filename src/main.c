@@ -60,14 +60,15 @@ int main (void)
 	double time = 0;
 	double oldTime = 0;
 
-	bool quit = false;
-	while (!quit) {
+	for (;;) {
 		SDL_Event event;
 		SDL_PollEvent(&event);
-		quit =
+
+		if (
 			(event.type == SDL_QUIT) ||
 			(event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_ESCAPE)
-		;
+		) break;
+
 		if (event.type == SDL_KEYDOWN) {
 			switch (event.key.keysym.sym) {
 				#define SET(key) \
