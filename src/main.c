@@ -127,10 +127,10 @@ void move (double frameTime)
 
 	#define KEYSTATE(key) (keypresses & KEY_##key)
 
-	bool move_forwards = KEYSTATE(w) | KEYSTATE(COMMA) | KEYSTATE(UP);
+	bool move_forwards = KEYSTATE(w) | KEYSTATE(UP);
 	bool move_left = KEYSTATE(a);
-	bool move_backwards = KEYSTATE(s) | KEYSTATE(o) | KEYSTATE(DOWN);
-	bool move_right = KEYSTATE(d) | KEYSTATE(e);
+	bool move_backwards = KEYSTATE(s) | KEYSTATE(DOWN);
+	bool move_right = KEYSTATE(d);
 	bool turn_left = KEYSTATE(LEFT);
 	bool turn_right = KEYSTATE(RIGHT);
 
