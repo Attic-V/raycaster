@@ -159,7 +159,7 @@ void render (SDL_Window *window, SDL_Renderer *renderer)
 {
 	#define RENDER_PIXEL(x, y, rgba8888) \
 		do { \
-			upixels[(x) + (y) * w] = SDL_MapRGBA(format, \
+			upixels[y][x] = SDL_MapRGBA(format, \
 				((rgba8888) & 0xff000000) >> 24, \
 				((rgba8888) & 0x00ff0000) >> 16, \
 				((rgba8888) & 0x0000ff00) >>  8, \
@@ -182,7 +182,7 @@ void render (SDL_Window *window, SDL_Renderer *renderer)
 	int pitch;
 	SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_BLEND);
 	SDL_LockTexture(texture, NULL, &pixels, &pitch);
-	uint32_t *upixels = (uint32_t *)pixels;
+	uint32_t (*upixels)[w] = (uint32_t (*)[w])pixels;
 
 	double vanishDist = 5;
 	double wallBrightnessDiff = 0.9;
