@@ -20,4 +20,4 @@ a: move left\
 d: move right\
 ←: turn left\
 →: turn right\
-;: toggle textures
+
