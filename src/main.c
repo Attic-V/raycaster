@@ -11,7 +11,7 @@
 
 #define PI acos(-1)
 
-void move (double frameTime);
+void move (float frameTime);
 void render (SDL_Window *window, SDL_Renderer *renderer);
 void setRenderDrawColor (SDL_Renderer *renderer, uint32_t color);
 
@@ -38,8 +38,8 @@ int main (void)
 		.dir = -PI / 9,
 	};
 
-	double time = 0;
-	double oldTime = 0;
+	float time = 0;
+	float oldTime = 0;
 
 	for (;;) {
 		SDL_Event event;
@@ -52,7 +52,7 @@ int main (void)
 
 		oldTime = time;
 		time = SDL_GetTicks64();
-		double frameTime = (time - oldTime) / 1000.0;
+		float frameTime = (time - oldTime) / 1000.0;
 
 		move(frameTime);
 
@@ -64,12 +64,12 @@ int main (void)
 	SDL_Quit();
 }
 
-void move (double frameTime)
+void move (float frameTime)
 {
 	const Uint8 *keystate = SDL_GetKeyboardState(NULL);
 
-	double movementspeed = 1.5 * frameTime;
-	double turnspeed = 2 * PI * 0.25 * frameTime;
+	float movementspeed = 1.5 * frameTime;
+	float turnspeed = 2 * PI * 0.25 * frameTime;
 
 	bool move_F = keystate[SDL_SCANCODE_W] || keystate[SDL_SCANCODE_UP];
 	bool move_L = keystate[SDL_SCANCODE_A];
@@ -78,13 +78,13 @@ void move (double frameTime)
 	bool turn_L = keystate[SDL_SCANCODE_LEFT];
 	bool turn_R = keystate[SDL_SCANCODE_RIGHT];
 
-	double move_x = movementspeed * (
+	float move_x = movementspeed * (
 		move_F *  cos(player.dir) +
 		move_L *  cos(player.dir + PI / 2) +
 		move_R *  cos(player.dir - PI / 2) +
 		move_B * -cos(player.dir)
 	);
-	double move_y = movementspeed * (
+	float move_y = movementspeed * (
 		move_F *  sin(player.dir) +
 		move_L *  sin(player.dir + PI / 2) +
 		move_R *  sin(player.dir - PI / 2) +
@@ -126,33 +126,33 @@ void render (SDL_Window *window, SDL_Renderer *renderer)
 	SDL_LockTexture(texture, NULL, &pixels, &pitch);
 	uint32_t (*upixels)[w] = (uint32_t (*)[w])pixels;
 
-	double vanishDist = 5;
-	double wallBrightnessDiff = 0.9;
+	float vanishDist = 5;
+	float wallBrightnessDiff = 0.9;
 
-	const double HFOV = PI / 2;
-	double VFOV = fabs(2 * atan(tan(HFOV / 2) * ((double)h / w)));
+	const float HFOV = PI / 2;
+	float VFOV = fabs(2 * atan(tan(HFOV / 2) * ((float)h / w)));
 
-	double cameraWidth = 2 * tan(HFOV / 2);
-	double cameraHeight = 2 * tan(VFOV / 2);
+	float cameraWidth = 2 * tan(HFOV / 2);
+	float cameraHeight = 2 * tan(VFOV / 2);
 
-	static const double wallHeight = 1;
+	static const float wallHeight = 1;
 
 	for (int i = 0; i < w; i++) {
-		double cameraX = cameraWidth * i / (double)w - cameraWidth / 2;
+		float cameraX = cameraWidth * i / (float)w - cameraWidth / 2;
 
-		double dir = player.dir + PI / 2 - atan2(1, cameraX * (HFOV > PI ? -1 : 1));
+		float dir = player.dir + PI / 2 - atan2(1, cameraX * (HFOV > PI ? -1 : 1));
 
 		int mapX = player.x;
 		int mapY = player.y;
 
-		double dirX = cos(dir);
-		double dirY = sin(dir);
+		float dirX = cos(dir);
+		float dirY = sin(dir);
 
-		double deltaX = dirX == 0 ? 1e30 : fabs(1 / dirX);
-		double deltaY = dirY == 0 ? 1e30 : fabs(1 / dirY);
+		float deltaX = dirX == 0 ? 1e30 : fabs(1 / dirX);
+		float deltaY = dirY == 0 ? 1e30 : fabs(1 / dirY);
 
-		double distX = deltaX * (dirX < 0 ? player.x - mapX : 1 - player.x + mapX);
-		double distY = deltaY * (dirY > 0 ? player.y - mapY : 1 - player.y + mapY);
+		float distX = deltaX * (dirX < 0 ? player.x - mapX : 1 - player.x + mapX);
+		float distY = deltaY * (dirY > 0 ? player.y - mapY : 1 - player.y + mapY);
 
 		int sX = dirX < 0 ? -1 : 1;
 		int sY = dirY > 0 ? -1 : 1;
@@ -171,13 +171,13 @@ void render (SDL_Window *window, SDL_Renderer *renderer)
 			}
 		}
 
-		double trueDist = side == 0 ? distX - deltaX : distY - deltaY;
-		double dist = trueDist * cos(player.dir - dir);
-		double percentVanishDist = (vanishDist - trueDist) / vanishDist;
+		float trueDist = side == 0 ? distX - deltaX : distY - deltaY;
+		float dist = trueDist * cos(player.dir - dir);
+		float percentVanishDist = (vanishDist - trueDist) / vanishDist;
 		if (trueDist > vanishDist) percentVanishDist = 0;
 
-		double windowY = (wallHeight / 2) / dist;
-		double screenWallHeight = h * (windowY * 2) / cameraHeight;
+		float windowY = (wallHeight / 2) / dist;
+		float screenWallHeight = h * (windowY * 2) / cameraHeight;
 
 		int type = map[mapY][mapX];
 
@@ -185,10 +185,10 @@ void render (SDL_Window *window, SDL_Renderer *renderer)
 		int lineEnd = h / 2 + screenWallHeight / 2 + 1;
 
 		if (percentVanishDist > 0) {
-			double collideX = player.x + dirX * trueDist;
-			double collideY = player.y - dirY * trueDist;
+			float collideX = player.x + dirX * trueDist;
+			float collideY = player.y - dirY * trueDist;
 
-			double wallX =
+			float wallX =
 				side == 0
 					? (sX < 0 ? 1 - collideY + (int)collideY : collideY - (int)collideY)
 					: (sY < 0 ? collideX - (int)collideX : 1 - collideX + (int)collideX)
@@ -201,7 +201,7 @@ void render (SDL_Window *window, SDL_Renderer *renderer)
 			RGBA8888 color;
 
 			for (int j = max(lineStart, 0); j < min(lineEnd, h); j++) {
-				int y = (double)(j - lineStart) / (lineEnd - lineStart) * TEXTURE_SIZE;
+				int y = (float)(j - lineStart) / (lineEnd - lineStart) * TEXTURE_SIZE;
 
 				color = column[y];
 				color = rgba_alphaReduce(color, percentVanishDist * (side ? wallBrightnessDiff : 1));
@@ -211,22 +211,22 @@ void render (SDL_Window *window, SDL_Renderer *renderer)
 		}
 
 		for (int y = lineEnd; y < h; y++) {
-			double screenPos = 2 * y - h;
-			double windowY = (screenPos * cameraHeight) / (h * 2);
-			double dist = wallHeight / (2 * windowY);
-			double trueDist = dist / cos(player.dir - dir);
+			float screenPos = 2 * y - h;
+			float windowY = (screenPos * cameraHeight) / (h * 2);
+			float dist = wallHeight / (2 * windowY);
+			float trueDist = dist / cos(player.dir - dir);
 
-			double percentVanishDist = (vanishDist - trueDist) / vanishDist;
+			float percentVanishDist = (vanishDist - trueDist) / vanishDist;
 			if (trueDist > vanishDist) continue;
 
-			double collideX = player.x + trueDist * dirX;
-			double collideY = player.y - trueDist * dirY;
+			float collideX = player.x + trueDist * dirX;
+			float collideY = player.y - trueDist * dirY;
 
 			int mapX = collideX;
 			int mapY = collideY;
 
-			double tileX = collideX - mapX;
-			double tileY = collideY - mapY;
+			float tileX = collideX - mapX;
+			float tileY = collideY - mapY;
 
 			int texX = tileX * TEXTURE_SIZE;
 			int texY = tileY * TEXTURE_SIZE;
