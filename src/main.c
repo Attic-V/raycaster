@@ -255,6 +255,7 @@ void render (SDL_Window *window, SDL_Renderer *renderer)
 	texture = NULL;
 
 	SDL_RenderPresent(renderer);
+	SDL_FreeFormat(format);
 
 	#undef RENDER_PIXEL
 }
