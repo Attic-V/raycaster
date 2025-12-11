@@ -17,22 +17,6 @@ void setRenderDrawColor (SDL_Renderer *renderer, uint32_t color);
 
 Player player;
 
-typedef enum {
-	KEY_w = (1 << 0),
-	KEY_a = (1 << 1),
-	KEY_s = (1 << 2),
-	KEY_d = (1 << 3),
-	KEY_COMMA = (1 << 4),
-	KEY_o = (1 << 5),
-	KEY_e = (1 << 6),
-	KEY_UP = (1 << 7),
-	KEY_LEFT = (1 << 8),
-	KEY_DOWN = (1 << 9),
-	KEY_RIGHT = (1 << 10),
-} Keys;
-
-int keypresses = 0;
-
 int main (void)
 {
 	initTextures();
@@ -66,31 +50,6 @@ int main (void)
 			(event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_ESCAPE)
 		) break;
 
-		if (event.type == SDL_KEYDOWN) {
-			switch (event.key.keysym.sym) {
-			case SDLK_w: keypresses |= KEY_w; break;
-			case SDLK_a: keypresses |= KEY_a; break;
-			case SDLK_s: keypresses |= KEY_s; break;
-			case SDLK_d: keypresses |= KEY_d; break;
-			case SDLK_UP: keypresses |= KEY_UP; break;
-			case SDLK_LEFT: keypresses |= KEY_LEFT; break;
-			case SDLK_DOWN: keypresses |= KEY_DOWN; break;
-			case SDLK_RIGHT: keypresses |= KEY_RIGHT; break;
-			}
-		}
-		if (event.type == SDL_KEYUP) {
-			switch (event.key.keysym.sym) {
-			case SDLK_w: keypresses &= ~0 ^ KEY_w; break;
-			case SDLK_a: keypresses &= ~0 ^ KEY_a; break;
-			case SDLK_s: keypresses &= ~0 ^ KEY_s; break;
-			case SDLK_d: keypresses &= ~0 ^ KEY_d; break;
-			case SDLK_UP: keypresses &= ~0 ^ KEY_UP; break;
-			case SDLK_LEFT: keypresses &= ~0 ^ KEY_LEFT; break;
-			case SDLK_DOWN: keypresses &= ~0 ^ KEY_DOWN; break;
-			case SDLK_RIGHT: keypresses &= ~0 ^ KEY_RIGHT; break;
-			}
-		}
-
 		oldTime = time;
 		time = SDL_GetTicks64();
 		double frameTime = (time - oldTime) / 1000.0;
@@ -107,33 +66,35 @@ int main (void)
 
 void move (double frameTime)
 {
+	const Uint8 *keystate = SDL_GetKeyboardState(NULL);
+
 	double movementspeed = 1.5 * frameTime;
 	double turnspeed = 2 * PI * 0.25 * frameTime;
 
-	bool move_forwards = (keypresses & KEY_w) | (keypresses & KEY_UP);
-	bool move_left = (keypresses & KEY_a);
-	bool move_backwards = (keypresses & KEY_s) | (keypresses & KEY_DOWN);
-	bool move_right = (keypresses & KEY_d);
-	bool turn_left = (keypresses & KEY_LEFT);
-	bool turn_right = (keypresses & KEY_RIGHT);
+	bool move_F = keystate[SDL_SCANCODE_W] || keystate[SDL_SCANCODE_UP];
+	bool move_L = keystate[SDL_SCANCODE_A];
+	bool move_B = keystate[SDL_SCANCODE_S] || keystate[SDL_SCANCODE_DOWN];
+	bool move_R = keystate[SDL_SCANCODE_D];
+	bool turn_L = keystate[SDL_SCANCODE_LEFT];
+	bool turn_R = keystate[SDL_SCANCODE_RIGHT];
 
 	double move_x = movementspeed * (
-		move_forwards  *  cos(player.dir) +
-		move_left      *  cos(player.dir + PI / 2) +
-		move_right     *  cos(player.dir - PI / 2) +
-		move_backwards * -cos(player.dir)
+		move_F *  cos(player.dir) +
+		move_L *  cos(player.dir + PI / 2) +
+		move_R *  cos(player.dir - PI / 2) +
+		move_B * -cos(player.dir)
 	);
 	double move_y = movementspeed * (
-		move_forwards  *  sin(player.dir) +
-		move_left      *  sin(player.dir + PI / 2) +
-		move_right     *  sin(player.dir - PI / 2) +
-		move_backwards * -sin(player.dir)
+		move_F *  sin(player.dir) +
+		move_L *  sin(player.dir + PI / 2) +
+		move_R *  sin(player.dir - PI / 2) +
+		move_B * -sin(player.dir)
 	);
 
 	player.x += move_x * !map[(int)player.y][(int)(player.x + move_x)];
 	player.y -= move_y * !map[(int)(player.y - move_y)][(int)player.x];
-	player.dir += turnspeed * turn_left;
-	player.dir -= turnspeed * turn_right;
+	player.dir += turnspeed * turn_L;
+	player.dir -= turnspeed * turn_R;
 }
 
 void render (SDL_Window *window, SDL_Renderer *renderer)
