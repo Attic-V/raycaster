@@ -18,20 +18,17 @@ void setRenderDrawColor (SDL_Renderer *renderer, uint32_t color);
 Player player;
 
 typedef enum {
-	#define KEY(key, idx) \
-		KEY_##key = (1 << idx)
-	KEY(w, 0),
-	KEY(a, 1),
-	KEY(s, 2),
-	KEY(d, 3),
-	KEY(COMMA, 4),
-	KEY(o, 5),
-	KEY(e, 6),
-	KEY(UP, 7),
-	KEY(LEFT, 8),
-	KEY(DOWN, 9),
-	KEY(RIGHT, 10),
-	#undef KEY
+	KEY_w = (1 << 0),
+	KEY_a = (1 << 1),
+	KEY_s = (1 << 2),
+	KEY_d = (1 << 3),
+	KEY_COMMA = (1 << 4),
+	KEY_o = (1 << 5),
+	KEY_e = (1 << 6),
+	KEY_UP = (1 << 7),
+	KEY_LEFT = (1 << 8),
+	KEY_DOWN = (1 << 9),
+	KEY_RIGHT = (1 << 10),
 } Keys;
 
 int keypresses = 0;
@@ -71,32 +68,26 @@ int main (void)
 
 		if (event.type == SDL_KEYDOWN) {
 			switch (event.key.keysym.sym) {
-				#define SET(key) \
-					case SDLK_##key: keypresses |= KEY_##key; break;
-				SET(w)
-				SET(a)
-				SET(s)
-				SET(d)
-				SET(UP)
-				SET(LEFT)
-				SET(DOWN)
-				SET(RIGHT)
-				#undef SET
+			case SDLK_w: keypresses |= KEY_w; break;
+			case SDLK_a: keypresses |= KEY_a; break;
+			case SDLK_s: keypresses |= KEY_s; break;
+			case SDLK_d: keypresses |= KEY_d; break;
+			case SDLK_UP: keypresses |= KEY_UP; break;
+			case SDLK_LEFT: keypresses |= KEY_LEFT; break;
+			case SDLK_DOWN: keypresses |= KEY_DOWN; break;
+			case SDLK_RIGHT: keypresses |= KEY_RIGHT; break;
 			}
 		}
 		if (event.type == SDL_KEYUP) {
 			switch (event.key.keysym.sym) {
-				#define UNSET(key) \
-					case SDLK_##key: keypresses &= ~0 ^ KEY_##key; break;
-				UNSET(w)
-				UNSET(a)
-				UNSET(s)
-				UNSET(d)
-				UNSET(UP)
-				UNSET(LEFT)
-				UNSET(DOWN)
-				UNSET(RIGHT)
-				#undef UNSET
+			case SDLK_w: keypresses &= ~0 ^ KEY_w; break;
+			case SDLK_a: keypresses &= ~0 ^ KEY_a; break;
+			case SDLK_s: keypresses &= ~0 ^ KEY_s; break;
+			case SDLK_d: keypresses &= ~0 ^ KEY_d; break;
+			case SDLK_UP: keypresses &= ~0 ^ KEY_UP; break;
+			case SDLK_LEFT: keypresses &= ~0 ^ KEY_LEFT; break;
+			case SDLK_DOWN: keypresses &= ~0 ^ KEY_DOWN; break;
+			case SDLK_RIGHT: keypresses &= ~0 ^ KEY_RIGHT; break;
 			}
 		}
 
@@ -119,16 +110,12 @@ void move (double frameTime)
 	double movementspeed = 1.5 * frameTime;
 	double turnspeed = 2 * PI * 0.25 * frameTime;
 
-	#define KEYSTATE(key) (keypresses & KEY_##key)
-
-	bool move_forwards = KEYSTATE(w) | KEYSTATE(UP);
-	bool move_left = KEYSTATE(a);
-	bool move_backwards = KEYSTATE(s) | KEYSTATE(DOWN);
-	bool move_right = KEYSTATE(d);
-	bool turn_left = KEYSTATE(LEFT);
-	bool turn_right = KEYSTATE(RIGHT);
-
-	#undef KEYSTATE
+	bool move_forwards = (keypresses & KEY_w) | (keypresses & KEY_UP);
+	bool move_left = (keypresses & KEY_a);
+	bool move_backwards = (keypresses & KEY_s) | (keypresses & KEY_DOWN);
+	bool move_right = (keypresses & KEY_d);
+	bool turn_left = (keypresses & KEY_LEFT);
+	bool turn_right = (keypresses & KEY_RIGHT);
 
 	double move_x = movementspeed * (
 		move_forwards  *  cos(player.dir) +
